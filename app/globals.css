@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-primary: #0052cc;
+  --color-primary-dark: #0747a6;
+  --color-secondary: #36b37e;
+  --color-accent: #6554c0;
+  --color-neutral-50: #f5f6f8;
+  --color-neutral-100: #ebecf0;
+  --color-neutral-200: #dfe1e6;
+  --color-neutral-700: #42526e;
+  --color-neutral-900: #172b4d;
+  --color-success: #00875a;
+  --color-warning: #ffab00;
+  --color-error: #de350b;
+  --color-info: #0065ff;
+  --color-gradient-start: #0052cc;
+  --color-gradient-end: #6554c0;
+
+  /* New colors */
+  --color-card-hover: #f8f9fd;
+  --color-subtle-accent: #f4f0ff;
+  --color-section-bg-start: #f7f9fc;
+  --color-section-bg-end: #ebf2fa;
+  --color-primary-glow: rgba(0, 82, 204, 0.1);
+  --color-secondary-glow: rgba(54, 179, 126, 0.1);
+  --color-accent-glow: rgba(101, 84, 192, 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.btn-primary {
+  @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors cursor-pointer;
 }
