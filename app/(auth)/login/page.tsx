@@ -6,8 +6,9 @@ import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -15,10 +16,18 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [mounted, setMounted] = useState(false);
+  const { status } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(ROUTES.home);
+    }
+  }, [status, router]);
 
   const validateForm = () => {
     let valid = true;
@@ -44,16 +53,29 @@ const LoginPage = () => {
     return valid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
-      toast.error("Please fix the form errors");
       return;
     }
 
     setIsLoading(true);
-
+    try {
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+      if (res?.error) {
+        toast.error("Incorrect Credentials");
+      } else {
+        window.location.href = ROUTES.home;
+      }
+    } catch (error) {
+      console.log("Error during OAuth login:", error);
+      toast.error("An error occurred during login. Please try again.");
+    }
     setIsLoading(false);
   };
 
@@ -71,7 +93,7 @@ const LoginPage = () => {
   };
 
   // This prevents hydration errors because the server version won't include client-side attributes
-  if (!mounted) {
+  if (!mounted || status === "loading") {
     return (
       <div className="min-h-screen flex flex-col md:flex-row">
         <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-16">
@@ -221,7 +243,7 @@ const LoginPage = () => {
 
           <p className="mt-8 text-center text-neutral-700">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-primary hover:underline">
+            <Link href={ROUTES.signup} className="text-primary hover:underline">
               Create one now
             </Link>
           </p>
