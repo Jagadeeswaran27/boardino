@@ -3,6 +3,7 @@ import { ROUTES } from "@/constants/routes";
 import Link from "next/link";
 import SignoutButton from "../auth/SignoutButton";
 import Image from "next/image";
+import { IMAGES } from "@/constants/Images";
 
 const Header = async () => {
   const session = await auth();
@@ -49,11 +50,11 @@ const Header = async () => {
             <>
               <SignoutButton />
               <Image
-                src={user?.image || ""}
+                src={user?.image || IMAGES.avatarPlaceholder}
                 alt="User Avatar"
                 width={40}
                 height={40}
-                className="rounded-full"
+                className="rounded-full cursor-pointer"
               />
             </>
           ) : (
