@@ -1,0 +1,7 @@
+{
+    "git": {
+      "deploymentEnabled": false,
+      "feature-branch": false,
+      "development": false
+    }
+  }
