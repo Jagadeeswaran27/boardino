@@ -1,6 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "2mb",
+    },
+  },
   images: {
     domains: [
       "avatars.githubusercontent.com",
