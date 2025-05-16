@@ -25,4 +25,15 @@ model User {
   hashedPassword       String?
   image                String?
   authenticationMethod String
+  Board                Board[]
+}
+
+model Board {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  createdAt   DateTime @default(now())
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+  memberIds   String[]
 }

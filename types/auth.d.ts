@@ -1,8 +1,10 @@
 export interface User {
   id?: string;
+  name: string;
   email: string;
   hashedPassword?: string;
-  name: string;
   image?: string;
-  authenticationMethod: string;
+  authenticationMethod: authenticationMethod;
 }
+
+export type authenticationMethod = "github" | "google" | "credentials";

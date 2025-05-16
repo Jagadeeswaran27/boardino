@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
 import { useRouter } from "next/navigation";

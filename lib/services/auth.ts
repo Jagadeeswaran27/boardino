@@ -53,3 +53,27 @@ export const createUser = async (
     return false;
   }
 };
+
+export const getUsersInfoById = async (userIds: string[]): Promise<User[]> => {
+  const response = await fetch(
+    "http://localhost:3000/api/auth/getUserDetails",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userIds }),
+    }
+  );
+  if (!response.ok) {
+    return [];
+  }
+  const data = (await response.json()) as User[];
+  return data.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    image: user.image,
+    authenticationMethod: user.authenticationMethod,
+  }));
+};
