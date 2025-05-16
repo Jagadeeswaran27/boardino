@@ -27,7 +27,6 @@ export async function POST(request: Request) {
     if (error) {
       return Response.json({ error }, { status: 500 });
     }
-    console.log("Email sent successfully:", data);
     return NextResponse.json(board, { status: 201 });
   } catch (error) {
     console.error("[BOARD_CREATE]", error);
