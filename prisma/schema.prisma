@@ -26,6 +26,7 @@ model User {
   image                String?
   authenticationMethod String
   Board                Board[]
+  assignedTasks        Task[]
 }
 
 model Board {
@@ -36,4 +37,27 @@ model Board {
   ownerId     String
   owner       User     @relation(fields: [ownerId], references: [id])
   memberIds   String[]
+  Column      Column[]
+  Task        Task[]
+}
+
+model Column {
+  id        String   @id @default(cuid())
+  name      String
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  columnId    String?
+  assigneeId  String? // optional user assigned to the task
+  assignee    User?    @relation(fields: [assigneeId], references: [id])
+  dueDate     DateTime
+  createdAt   DateTime @default(now())
+  boardId     String
+  board       Board    @relation(fields: [boardId], references: [id])
 }

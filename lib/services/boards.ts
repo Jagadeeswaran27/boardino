@@ -1,6 +1,30 @@
 import { auth } from "@/auth";
 import { prisma } from "../prisma";
-import { Board } from "@/types/board";
+import { Board, Column } from "@/types/board";
+
+export const createBoard = async (
+  board: Omit<Board, "id" | "createdAt" | "owner">
+): Promise<Board | null> => {
+  const response = await fetch("http://localhost:3000/api/boards/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(board),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = (await response.json()) as Board;
+  return {
+    createdAt: new Date(data.createdAt),
+    description: data.description,
+    id: data.id,
+    memberIds: data.memberIds,
+    name: data.name,
+    ownerId: data.ownerId,
+  };
+};
 
 export const getBoards = async (): Promise<Board[]> => {
   const session = await auth();
@@ -43,27 +67,38 @@ export const getBoards = async (): Promise<Board[]> => {
   }));
 };
 
-export const createBoard = async (
-  board: Omit<Board, "id" | "createdAt" | "owner">
-): Promise<Board | null> => {
-  const response = await fetch("http://localhost:3000/api/boards/create", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+export const getBoard = async (boardId: string): Promise<Board | null> => {
+  const session = await auth();
+  if (!session?.user?.id) return null;
+  const board = await prisma.board.findUnique({
+    where: {
+      id: boardId,
     },
-    body: JSON.stringify(board),
+    include: {
+      owner: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          image: true,
+        },
+      },
+    },
   });
-  if (!response.ok) {
-    return null;
-  }
-  const data = (await response.json()) as Board;
+  if (!board) return null;
   return {
-    createdAt: new Date(data.createdAt),
-    description: data.description,
-    id: data.id,
-    memberIds: data.memberIds,
-    name: data.name,
-    ownerId: data.ownerId,
+    id: board.id,
+    name: board.name,
+    description: board.description,
+    createdAt: board.createdAt,
+    ownerId: board.ownerId,
+    memberIds: board.memberIds,
+    owner: {
+      id: board.owner.id,
+      name: board.owner.name,
+      email: board.owner.email,
+      image: board.owner.image,
+    },
   };
 };
 
@@ -79,4 +114,42 @@ export const deleteBoard = async (boardId: string): Promise<boolean> => {
     return false;
   }
   return true;
+};
+
+export const createColumn = async (
+  boardId: string,
+  name: string
+): Promise<Column | null> => {
+  const response = await fetch(
+    "http://localhost:3000/api/boards/columns/create",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, boardId }),
+    }
+  );
+  if (!response.ok) {
+    return null;
+  }
+  const data = (await response.json()) as Column;
+  console.log("Column created:", data);
+  return data;
+};
+
+export const getColumns = async (boardId: string): Promise<Column[]> => {
+  const session = await auth();
+  if (!session?.user?.id) return [];
+  const columns = await prisma.column.findMany({
+    where: {
+      boardId,
+    },
+  });
+  return columns.map((column) => ({
+    id: column.id,
+    name: column.name,
+    boardId: column.boardId,
+    createdAt: column.createdAt,
+  }));
 };

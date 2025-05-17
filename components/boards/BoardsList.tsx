@@ -86,7 +86,7 @@ const BoardsList = ({ boards: initialBoards }: BoardsListProps) => {
       setShowUndoNotification(false);
       setRecentlyDeleted(null);
       setNotificationTimer(null);
-    }, 5000);
+    }, 3000);
 
     setNotificationTimer(timer);
   };

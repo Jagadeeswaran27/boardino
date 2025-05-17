@@ -16,6 +16,8 @@ import Image from "next/image";
 import { IMAGES } from "@/constants/Images";
 import { formatDate } from "@/lib/utils/date";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { ROUTES } from "@/constants/routes";
 
 interface BoardCardProps {
   board: Board;
@@ -133,9 +135,12 @@ const BoardCard = ({ board, deleteBoard }: BoardCardProps) => {
             </div>
           </div>
 
-          <button className="text-primary cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-sm font-medium">
+          <Link
+            href={`${ROUTES.boards}/${board.id}`}
+            className="text-primary cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity flex items-center text-sm font-medium"
+          >
             Open <MdArrowForward className="ml-1" />
-          </button>
+          </Link>
         </div>
       </div>
     </motion.div>
