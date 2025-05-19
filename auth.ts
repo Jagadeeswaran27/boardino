@@ -5,6 +5,7 @@ import { addUserInfo } from "./lib/services/auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./lib/prisma";
 import bcrypt from "bcryptjs";
+import { authenticationMethod } from "./types/auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -64,11 +65,41 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       await addUserInfo({
         name: user.name ?? "",
         email: user.email ?? "",
-        image: user.image ?? undefined,
-        authenticationMethod: account?.provider ?? "",
+        image: user.image ?? null,
+        authenticationMethod:
+          (account?.provider as authenticationMethod) ??
+          ("" as authenticationMethod),
       });
 
       return true;
+    },
+    async jwt({ token, user, account }) {
+      if (account && user) {
+        if (account.provider !== "credentials") {
+          const dbUser = await prisma.user.findFirst({
+            where: {
+              email: user.email!,
+              authenticationMethod: account.provider,
+            },
+          });
+
+          if (dbUser) {
+            token.dbId = dbUser.id;
+            token.userImage = dbUser.image ?? user.image ?? "";
+          }
+        } else {
+          token.dbId = user.id;
+          token.userImage = user.image ?? "";
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token.dbId) {
+        session.user.id = token.dbId as string;
+        session.user.image = token.userImage as string;
+      }
+      return session;
     },
   },
 });

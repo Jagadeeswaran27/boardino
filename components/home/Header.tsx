@@ -17,7 +17,12 @@ const Header = async () => {
           <div className="h-10 w-10 bg-primary rounded-md flex items-center justify-center">
             <span className="text-white font-bold text-xl">B</span>
           </div>
-          <h1 className="text-2xl font-bold text-neutral-900">Boardino</h1>
+          <Link
+            href={ROUTES.home}
+            className="text-2xl font-bold text-neutral-900"
+          >
+            Boardino
+          </Link>
         </div>
         <nav className="hidden md:flex items-center gap-8">
           <Link
@@ -49,13 +54,15 @@ const Header = async () => {
           {user ? (
             <>
               <SignoutButton />
-              <Image
-                src={user?.image || IMAGES.avatarPlaceholder}
-                alt="User Avatar"
-                width={40}
-                height={40}
-                className="rounded-full cursor-pointer"
-              />
+              <Link href={ROUTES.boards}>
+                <Image
+                  src={user?.image || IMAGES.avatarPlaceholder}
+                  alt="User Avatar"
+                  width={40}
+                  height={40}
+                  className="rounded-full cursor-pointer"
+                />
+              </Link>
             </>
           ) : (
             <>

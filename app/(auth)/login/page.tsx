@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
 import { useRouter } from "next/navigation";
@@ -73,7 +72,7 @@ const LoginPage = () => {
         window.location.href = ROUTES.home;
       }
     } catch (error) {
-      console.log("Error during OAuth login:", error);
+      console.error("Error during OAuth login:", error);
       toast.error("An error occurred during login. Please try again.");
     }
     setIsLoading(false);

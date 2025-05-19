@@ -7,7 +7,12 @@ const SignoutButton = () => {
     await signOut({ callbackUrl: ROUTES.login });
   };
   return (
-    <button onClick={handleSignOut} className="btn-primary" type="submit">
+    <button
+      onClick={handleSignOut}
+      className="btn-primary"
+      type="submit"
+      suppressHydrationWarning={true}
+    >
       Logout
     </button>
   );
