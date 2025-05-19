@@ -111,7 +111,7 @@ const SignupPage = () => {
         }
       }
     } catch (error) {
-      console.log("Error during registration:", error);
+      console.error("Error during registration:", error);
       toast.error("An error occurred during registration. Please try again.");
     }
     setIsLoading(false);

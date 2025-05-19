@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   hashedPassword?: string;
-  image?: string;
+  image: string | null;
   authenticationMethod: authenticationMethod;
 }
 

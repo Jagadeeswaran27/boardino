@@ -72,7 +72,7 @@ const LoginPage = () => {
         window.location.href = ROUTES.home;
       }
     } catch (error) {
-      console.log("Error during OAuth login:", error);
+      console.error("Error during OAuth login:", error);
       toast.error("An error occurred during login. Please try again.");
     }
     setIsLoading(false);

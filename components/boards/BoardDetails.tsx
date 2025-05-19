@@ -5,7 +5,7 @@ import { Board, Column } from "@/types/board";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   MdAdd,
   MdArrowBack,
@@ -15,16 +15,13 @@ import {
   MdClose,
 } from "react-icons/md";
 import { motion } from "framer-motion";
-import { User } from "@/types/auth";
-import { getUsersInfoById } from "@/lib/services/auth";
 import { HiOutlineViewBoards } from "react-icons/hi";
 import { ROUTES } from "@/constants/routes";
 import { toast } from "react-toastify";
 import { createColumn } from "@/lib/services/boards";
 import ColumnDetails from "../columns/ColumnDetails";
+import { TABS, Tabs } from "@/lib/utils/board";
 
-export type Tabs = "In Progress" | "Completed";
-const TABS: string[] = ["In Progress", "Completed"];
 interface BoardDetailsProps {
   board: Board;
   columns: Column[];
@@ -34,21 +31,15 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState<Tabs | string>("In Progress");
-  const [members, setMembers] = useState<User[]>([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [columns, setColumns] = useState<Column[]>(initialColums);
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
-  useEffect(() => {
-    const fetchMembersDetails = async () => {
-      const membersDetails = await getUsersInfoById(board.memberIds);
-      setMembers(membersDetails);
-    };
-    fetchMembersDetails();
-  }, [board.memberIds]);
+  const userId = session?.user?.id;
 
-  const isOwner = board?.ownerId === session?.user?.id;
+  const isOwner =
+    board.members?.find((m) => m.userId === userId)?.role === "OWNER";
 
   const handleAddColumn = async () => {
     if (newColumnTitle.trim() === "") {
@@ -181,13 +172,15 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => setIsAddingColumn(true)}
-                className="px-4 py-2 flex items-center gap-1 text-sm font-medium text-neutral-600 hover:text-neutral-900 border-b-2 border-transparent -mb-px"
-              >
-                <MdAdd size={18} />
-                <span>Add Column</span>
-              </button>
+              isOwner && (
+                <button
+                  onClick={() => setIsAddingColumn(true)}
+                  className="px-4 py-2 flex items-center gap-1 text-sm font-medium text-neutral-600 hover:text-neutral-900 border-b-2 border-transparent -mb-px"
+                >
+                  <MdAdd size={18} />
+                  <span>Add Column</span>
+                </button>
+              )
             )}
           </div>
         </div>
@@ -204,6 +197,9 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
                 ? activeTab
                 : columns.find((c) => c.id === activeTab)!.name
             }
+            isOwner={isOwner}
+            users={board.members?.map((m) => m.user) || []}
+            boardId={board.id}
           />
 
           {/* Sidebar with Board Info */}
@@ -216,11 +212,11 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
                 </h3>
                 <div className="flex items-center text-sm text-neutral-500 mb-2">
                   <MdAccessTime className="mr-2" size={16} />
-                  <span>Created {formatDate(board.createdAt)}</span>
+                  <span>Created {formatDate(new Date(board.createdAt))}</span>
                 </div>
                 <div className="flex items-center text-sm text-neutral-500 mb-3">
                   <MdPeopleOutline className="mr-2" size={16} />
-                  <span>{members.length} members</span>
+                  <span>{board.members!.length} members</span>
                 </div>
 
                 <div className="pt-2 border-t border-neutral-100">
@@ -256,30 +252,41 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
                 </div>
 
                 <div className="space-y-3 max-h-[240px] overflow-y-auto pr-1">
-                  {members.map((member) => (
-                    <div key={member.id} className="flex items-center gap-3">
-                      <Image
-                        src={member.image || IMAGES.avatarPlaceholder}
-                        alt={member.name || "Member"}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-neutral-800 truncate">
-                          {member.name}
-                        </p>
-                        <p className="text-xs text-neutral-500 truncate">
-                          {member.email}
-                        </p>
+                  {board.members &&
+                    board.members.map((member) => (
+                      <div key={member.id} className="flex items-center gap-3">
+                        <Image
+                          src={member.user.image || IMAGES.avatarPlaceholder}
+                          alt={member.user.name || "Member"}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-neutral-800 truncate">
+                            {member.user.name}
+                            {member.userId === userId && (
+                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                                You
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-xs text-neutral-500 truncate">
+                            {member.user.email}
+                          </p>
+                        </div>
+                        {member.role === "OWNER" && (
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                            Owner
+                          </span>
+                        )}
+                        {member.role === "EDITOR" && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                            Editor
+                          </span>
+                        )}
                       </div>
-                      {member.id === board.ownerId && (
-                        <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                          Owner
-                        </span>
-                      )}
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             </div>

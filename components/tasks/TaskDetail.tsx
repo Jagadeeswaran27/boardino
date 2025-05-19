@@ -1,12 +1,7 @@
 import { Task } from "@/types/board";
 import { User } from "@/types/auth";
 import React from "react";
-import {
-  MdAccessTime,
-  MdPerson,
-  MdCalendarToday,
-  MdDescription,
-} from "react-icons/md";
+import { MdAccessTime, MdCalendarToday, MdDescription } from "react-icons/md";
 import Image from "next/image";
 import { IMAGES } from "@/constants/Images";
 
@@ -75,26 +70,17 @@ const TaskDetail = ({ task, assignee }: TaskDetailProps) => {
           </div>
         )}
 
-        {task.assigneeId && (
-          <div className="flex items-center gap-2 text-xs text-neutral-600 bg-neutral-50 p-1.5 pl-2 rounded-md">
-            {assignee?.image ? (
-              <Image
-                src={IMAGES.avatarPlaceholder}
-                alt={assignee.name || "User"}
-                width={20}
-                height={20}
-                className="rounded-full"
-              />
-            ) : (
-              <div className="w-5 h-5 rounded-full bg-accent-glow flex items-center justify-center">
-                <MdPerson className="text-accent" size={12} />
-              </div>
-            )}
-            <span className="font-medium">
-              {assignee?.name || "Unassigned"}
-            </span>
-          </div>
-        )}
+        <div className="flex items-center gap-2 text-xs text-neutral-600 bg-neutral-50 p-1.5 pl-2 rounded-md">
+          <Image
+            src={assignee?.image || IMAGES.avatarPlaceholder}
+            alt={assignee?.name || "User"}
+            width={20}
+            height={20}
+            className="rounded-full"
+          />
+
+          <span className="font-medium">{assignee?.name || "Unassigned"}</span>
+        </div>
       </div>
     </div>
   );

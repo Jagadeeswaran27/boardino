@@ -40,7 +40,7 @@ const BoardsList = ({ boards: initialBoards }: BoardsListProps) => {
   const contributedBoards = filteredBoards.filter(
     (board) =>
       board.ownerId !== data?.user?.id &&
-      board.memberIds.includes(data?.user?.id || "")
+      board.members?.some((member) => member.userId === data?.user?.id)
   );
 
   useEffect(() => {
@@ -124,7 +124,7 @@ const BoardsList = ({ boards: initialBoards }: BoardsListProps) => {
       <div className="relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-neutral-900">Your Boards</h1>
+            <h1 className="text-3xl font-bold text-neutral-900">Boards</h1>
             <p className="text-neutral-700 mt-1">
               Manage and organize your projects
             </p>

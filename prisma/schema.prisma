@@ -19,26 +19,39 @@ model test {
 }
 
 model User {
-  id                   String  @id @default(cuid())
+  id                   String        @id @default(cuid())
   name                 String
   email                String
   hashedPassword       String?
   image                String?
   authenticationMethod String
-  Board                Board[]
+  boardsOwned          Board[]       @relation("OwnerBoards")
   assignedTasks        Task[]
+  boardMemberships     BoardMember[]
 }
 
 model Board {
-  id          String   @id @default(cuid())
+  id          String        @id @default(cuid())
   name        String
   description String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime      @default(now())
   ownerId     String
-  owner       User     @relation(fields: [ownerId], references: [id])
-  memberIds   String[]
-  Column      Column[]
-  Task        Task[]
+  owner       User          @relation("OwnerBoards", fields: [ownerId], references: [id])
+  members     BoardMember[]
+  columns     Column[]
+  tasks       Task[]
+}
+
+model BoardMember {
+  id      String @id @default(cuid())
+  userId  String
+  boardId String
+  role    Role   @default(VIEWER) // ENUM type for role
+
+  user  User  @relation(fields: [userId], references: [id])
+  board Board @relation(fields: [boardId], references: [id])
+
+  @@unique([userId, boardId]) // Prevent duplicate membership
 }
 
 model Column {
@@ -60,4 +73,10 @@ model Task {
   createdAt   DateTime @default(now())
   boardId     String
   board       Board    @relation(fields: [boardId], references: [id])
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
 }

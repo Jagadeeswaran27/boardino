@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { prisma } from "../prisma";
-import { Board, Column } from "@/types/board";
+import { Board, Column, Task } from "@/types/board";
 
 export const createBoard = async (
   board: Omit<Board, "id" | "createdAt" | "owner">
@@ -16,25 +16,31 @@ export const createBoard = async (
     return null;
   }
   const data = (await response.json()) as Board;
-  return {
-    createdAt: new Date(data.createdAt),
-    description: data.description,
-    id: data.id,
-    memberIds: data.memberIds,
-    name: data.name,
-    ownerId: data.ownerId,
-  };
+  return data;
 };
 
 export const getBoards = async (): Promise<Board[]> => {
   const session = await auth();
   if (!session?.user?.id) return [];
+
+  const userId = session.user.id;
+
+  const boardMemberships = await prisma.boardMember.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      boardId: true,
+    },
+  });
+
+  const memberBoardIds = boardMemberships.map(
+    (membership) => membership.boardId
+  );
+
   const boards = await prisma.board.findMany({
     where: {
-      OR: [
-        { ownerId: session.user.id },
-        { memberIds: { has: session.user.id } },
-      ],
+      OR: [{ ownerId: userId }, { id: { in: memberBoardIds } }],
     },
     include: {
       owner: {
@@ -43,6 +49,22 @@ export const getBoards = async (): Promise<Board[]> => {
           name: true,
           email: true,
           image: true,
+        },
+      },
+      members: {
+        select: {
+          userId: true,
+          id: true,
+          boardId: true,
+          role: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
         },
       },
     },
@@ -57,12 +79,12 @@ export const getBoards = async (): Promise<Board[]> => {
     description: board.description,
     createdAt: board.createdAt,
     ownerId: board.ownerId,
-    memberIds: board.memberIds,
+    members: board.members,
     owner: {
       id: board.owner.id,
       name: board.owner.name,
       email: board.owner.email,
-      image: board.owner.image,
+      image: board.owner.image ?? "",
     },
   }));
 };
@@ -83,6 +105,22 @@ export const getBoard = async (boardId: string): Promise<Board | null> => {
           image: true,
         },
       },
+      members: {
+        select: {
+          userId: true,
+          id: true,
+          boardId: true,
+          role: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+        },
+      },
     },
   });
   if (!board) return null;
@@ -92,12 +130,12 @@ export const getBoard = async (boardId: string): Promise<Board | null> => {
     description: board.description,
     createdAt: board.createdAt,
     ownerId: board.ownerId,
-    memberIds: board.memberIds,
+    members: board.members,
     owner: {
       id: board.owner.id,
       name: board.owner.name,
       email: board.owner.email,
-      image: board.owner.image,
+      image: board.owner.image ?? "",
     },
   };
 };
@@ -134,7 +172,6 @@ export const createColumn = async (
     return null;
   }
   const data = (await response.json()) as Column;
-  console.log("Column created:", data);
   return data;
 };
 
@@ -152,4 +189,36 @@ export const getColumns = async (boardId: string): Promise<Column[]> => {
     boardId: column.boardId,
     createdAt: column.createdAt,
   }));
+};
+
+export const addTask = async (
+  task: Omit<Task, "id" | "createdAt">
+): Promise<string | null> => {
+  const response = await fetch("http://localhost:3000/api/boards/task/create", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(task),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = (await response.json()) as Task;
+  return data.id;
+};
+
+export const getTasks = async (boardId: string): Promise<Task[]> => {
+  const response = await fetch("http://localhost:3000/api/boards/task/getAll", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ boardId }),
+  });
+  if (!response.ok) {
+    return [];
+  }
+  const data = (await response.json()) as Task[];
+  return data;
 };

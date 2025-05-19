@@ -54,7 +54,6 @@ const CreateBoardModal = ({
         name,
         description,
         ownerId: session.user.id,
-        memberIds: [session.user.id],
       });
       if (!newBoard) {
         return;

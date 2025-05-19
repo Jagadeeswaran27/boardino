@@ -5,13 +5,26 @@ import React, { useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import { FaTimes } from "react-icons/fa";
+import { addTask } from "@/lib/services/boards";
+import { toast } from "react-toastify";
+import { Task } from "@/types/board";
 
 interface AddTaskFormProps {
   closeModal: () => void;
   users: Omit<User, "hashedPassword" | "authenticationMethod">[];
   isOpen: boolean;
+  boardId: string;
+  columnId: string | null;
+  updateTask: (task: Task) => void;
 }
-const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
+const AddTaskForm = ({
+  closeModal,
+  users,
+  isOpen,
+  boardId,
+  columnId,
+  updateTask,
+}: AddTaskFormProps) => {
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -19,18 +32,86 @@ const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
     dueDate: "",
   });
 
+  const [errors, setErrors] = useState({
+    name: "",
+    description: "",
+    dueDate: "",
+  });
+
+  const [loading, setIsLoading] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+
+    if (errors[e.target.name as keyof typeof errors]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: "",
+      });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.name) return;
+  const validateForm = () => {
+    let valid = true;
+    const newErrors = { ...errors };
 
+    if (!form.name.trim()) {
+      newErrors.name = "Task name is required";
+      valid = false;
+    }
+
+    if (!form.description.trim()) {
+      newErrors.description = "Description should be at least 5 characters";
+      valid = false;
+    }
+
+    if (!form.dueDate) {
+      newErrors.dueDate = "Due date is required";
+      valid = false;
+    } else {
+      const selectedDate = new Date(form.dueDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        newErrors.dueDate = "Due date cannot be in the past";
+        valid = false;
+      }
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+    setIsLoading(true);
+    const taskData = {
+      name: form.name,
+      description: form.description,
+      columnId,
+      assigneeId: form.assigneeId === "" ? null : form.assigneeId,
+      dueDate: new Date(form.dueDate),
+      boardId,
+    };
+    const addedTaskId = await addTask(taskData);
+
+    if (!addedTaskId) {
+      toast.error("Failed to add task");
+      return;
+    }
+    updateTask({
+      ...taskData,
+      id: addedTaskId,
+      createdAt: new Date(),
+    });
+    setIsLoading(false);
     closeModal();
   };
 
@@ -90,27 +171,34 @@ const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      required
-                      className="w-full border border-neutral-300 rounded-md px-3 py-2"
+                      className={`w-full border ${errors.name ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
                       placeholder="Task name"
                     />
+                    {errors.name && (
+                      <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+                    )}
                   </div>
                   <div>
                     <label
                       className="block text-sm font-medium mb-1"
                       htmlFor="description"
                     >
-                      Description
+                      Description<span className="text-red-500">*</span>
                     </label>
                     <textarea
                       id="description"
                       name="description"
                       value={form.description}
                       onChange={handleChange}
-                      className="w-full border border-neutral-300 rounded-md px-3 py-2"
+                      className={`w-full border ${errors.description ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
                       placeholder="Task description"
                       rows={3}
                     />
+                    {errors.description && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.description}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label
@@ -139,7 +227,7 @@ const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
                       className="block text-sm font-medium mb-1"
                       htmlFor="dueDate"
                     >
-                      Due Date
+                      Due Date<span className="text-red-500">*</span>
                     </label>
                     <input
                       id="dueDate"
@@ -147,8 +235,13 @@ const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
                       type="date"
                       value={form.dueDate}
                       onChange={handleChange}
-                      className="w-full border border-neutral-300 rounded-md px-3 py-2"
+                      className={`w-full border ${errors.dueDate ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
                     />
+                    {errors.dueDate && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.dueDate}
+                      </p>
+                    )}
                   </div>
                   <div className="flex justify-end gap-2">
                     <button
@@ -158,8 +251,12 @@ const AddTaskForm = ({ closeModal, users, isOpen }: AddTaskFormProps) => {
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="btn-primary">
-                      Add Task
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-primary"
+                    >
+                      {loading ? "Adding..." : "Add Task"}
                     </button>
                   </div>
                 </form>
