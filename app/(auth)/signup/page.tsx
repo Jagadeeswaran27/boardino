@@ -5,7 +5,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
 import { createUser } from "@/lib/services/auth";
@@ -112,7 +111,7 @@ const SignupPage = () => {
         }
       }
     } catch (error) {
-      console.log("Error during registration:", error);
+      console.error("Error during registration:", error);
       toast.error("An error occurred during registration. Please try again.");
     }
     setIsLoading(false);
@@ -318,7 +317,7 @@ const SignupPage = () => {
 
           <p className="mt-8 text-center text-neutral-700">
             Already have an account?{" "}
-            <Link href="/login" className="text-primary hover:underline">
+            <Link href={ROUTES.login} className="text-primary hover:underline">
               Sign in
             </Link>
           </p>
