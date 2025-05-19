@@ -2,10 +2,12 @@ import { auth } from "@/auth";
 import { prisma } from "../prisma";
 import { Board, Column, Task } from "@/types/board";
 
+const url = process.env.NEXT_PUBLIC_URL;
+
 export const createBoard = async (
   board: Omit<Board, "id" | "createdAt" | "owner">
 ): Promise<Board | null> => {
-  const response = await fetch("http://localhost:3000/api/boards/create", {
+  const response = await fetch(`${url}/api/boards/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -141,7 +143,7 @@ export const getBoard = async (boardId: string): Promise<Board | null> => {
 };
 
 export const deleteBoard = async (boardId: string): Promise<boolean> => {
-  const response = await fetch(`http://localhost:3000/api/boards/delete`, {
+  const response = await fetch(`${url}/api/boards/delete`, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
@@ -158,16 +160,13 @@ export const createColumn = async (
   boardId: string,
   name: string
 ): Promise<Column | null> => {
-  const response = await fetch(
-    "http://localhost:3000/api/boards/columns/create",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, boardId }),
-    }
-  );
+  const response = await fetch(`${url}/api/boards/columns/create`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name, boardId }),
+  });
   if (!response.ok) {
     return null;
   }
@@ -194,7 +193,7 @@ export const getColumns = async (boardId: string): Promise<Column[]> => {
 export const addTask = async (
   task: Omit<Task, "id" | "createdAt">
 ): Promise<string | null> => {
-  const response = await fetch("http://localhost:3000/api/boards/task/create", {
+  const response = await fetch(`${url}/api/boards/task/create`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -209,7 +208,8 @@ export const addTask = async (
 };
 
 export const getTasks = async (boardId: string): Promise<Task[]> => {
-  const response = await fetch("http://localhost:3000/api/boards/task/getAll", {
+  console.log(url);
+  const response = await fetch(`${url}/api/boards/task/getAll`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

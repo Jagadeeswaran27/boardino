@@ -5,12 +5,11 @@ import { getBoard, getColumns } from "@/lib/services/boards";
 import { redirect } from "next/navigation";
 
 interface PageProps {
-  params: { id: string };
-  searchParams: Record<string, string | string[] | undefined>;
+  params: Promise<{ id: string }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = params;
+  const { id } = await params;
 
   const board = await getBoard(id);
 

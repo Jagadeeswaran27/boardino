@@ -65,7 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       await addUserInfo({
         name: user.name ?? "",
         email: user.email ?? "",
-        image: user.image ?? undefined,
+        image: user.image ?? null,
         authenticationMethod:
           (account?.provider as authenticationMethod) ??
           ("" as authenticationMethod),
