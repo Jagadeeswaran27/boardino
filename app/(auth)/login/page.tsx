@@ -17,6 +17,8 @@ const LoginPage = () => {
   const [mounted, setMounted] = useState(false);
   const { status } = useSession();
   const router = useRouter();
+  const searchParams = new URLSearchParams(window.location.search);
+  const returnUrl = searchParams.get("returnUrl") || ROUTES.home;
 
   useEffect(() => {
     setMounted(true);
@@ -24,9 +26,9 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(ROUTES.home);
+      router.replace(returnUrl);
     }
-  }, [status, router]);
+  }, [status, router, returnUrl]);
 
   const validateForm = () => {
     let valid = true;
@@ -69,7 +71,7 @@ const LoginPage = () => {
       if (res?.error) {
         toast.error("Incorrect Credentials");
       } else {
-        window.location.href = ROUTES.home;
+        window.location.href = returnUrl;
       }
     } catch (error) {
       console.error("Error during OAuth login:", error);
@@ -82,7 +84,7 @@ const LoginPage = () => {
     setIsLoading(true);
     try {
       await signIn(provider, {
-        callbackUrl: ROUTES.home,
+        callbackUrl: returnUrl,
       });
     } catch (error) {
       console.error("Error during OAuth login:", error);
