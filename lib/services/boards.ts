@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "../prisma";
 import { Board, Column, Task } from "@/types/board";
+import { BoardInvitation } from "@prisma/client";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -208,7 +209,6 @@ export const addTask = async (
 };
 
 export const getTasks = async (boardId: string): Promise<Task[]> => {
-  console.log(url);
   const response = await fetch(`${url}/api/boards/task/getAll`, {
     method: "POST",
     headers: {
@@ -221,4 +221,66 @@ export const getTasks = async (boardId: string): Promise<Task[]> => {
   }
   const data = (await response.json()) as Task[];
   return data;
+};
+
+export const sendInviteEmail = async (
+  email: string[],
+  boardId: string,
+  boardName: string,
+  message: string,
+  senderName: string,
+  role: string
+): Promise<boolean> => {
+  const response = await fetch(`${url}/api/boards/invite`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      boardId,
+      boardName,
+      message,
+      senderName,
+      role,
+    }),
+  });
+  if (!response.ok) {
+    return false;
+  }
+  return true;
+};
+
+export const getBoardInvitation = async (
+  boardInvitationId: string
+): Promise<BoardInvitation | null> => {
+  try {
+    const invitation = await prisma.boardInvitation.findUnique({
+      where: {
+        id: boardInvitationId,
+      },
+    });
+    if (!invitation) throw new Error("Board invitation not found");
+    return invitation;
+  } catch (error) {
+    console.error("Error fetching board invitation:", error);
+    return null;
+  }
+};
+
+export const acceptBoardInvitation = async (
+  boardInvitation: BoardInvitation
+): Promise<boolean> => {
+  const response = await fetch(`${url}/api/boards/invite/accept`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ boardInvitation }),
+  });
+  if (!response.ok) {
+    return false;
+  }
+  const res = (await response.json()) as boolean;
+  return res;
 };

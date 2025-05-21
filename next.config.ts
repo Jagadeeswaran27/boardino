@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
       "avatars.githubusercontent.com",
       "lh3.googleusercontent.com",
       "api.dicebear.com",
+      "www.gravatar.com",
     ],
   },
 };
