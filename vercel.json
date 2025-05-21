@@ -1,9 +1,5 @@
 {
-    "git": {
-      "deploymentEnabled": {
-        "main": true,
-        "dev": false,
-        "*": false
-      }
-    }
+  "build": {
+    "ignoredBuildStep": "if [ \"$VERCEL_GIT_BRANCH\" != \"main\" ]; then exit 1; fi"
   }
+}

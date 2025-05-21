@@ -14,13 +14,13 @@ import {
   MdAccessTime,
   MdClose,
 } from "react-icons/md";
-import { motion } from "framer-motion";
 import { HiOutlineViewBoards } from "react-icons/hi";
 import { ROUTES } from "@/constants/routes";
 import { toast } from "react-toastify";
 import { createColumn } from "@/lib/services/boards";
 import ColumnDetails from "../columns/ColumnDetails";
 import { TABS, Tabs } from "@/lib/utils/board";
+import InviteMembersModal from "./InviteMembersModal";
 
 interface BoardDetailsProps {
   board: Board;
@@ -296,67 +296,12 @@ const BoardDetails = ({ board, columns: initialColums }: BoardDetailsProps) => {
 
       {/* Invite Members Modal */}
       {isInviteModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4"
-          >
-            <div className="p-5 border-b border-neutral-200">
-              <h2 className="text-xl font-semibold text-neutral-900">
-                Invite Members
-              </h2>
-              <p className="text-neutral-600 text-sm">
-                Add members to collaborate on this board
-              </p>
-            </div>
-
-            <div className="p-5">
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="Enter email address"
-                  className="w-full p-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
-                />
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Role
-                </label>
-                <select className="w-full p-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-                  <option>Member</option>
-                  <option>Admin</option>
-                  <option>Viewer</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-neutral-700 mb-1">
-                  Message (optional)
-                </label>
-                <textarea
-                  placeholder="Add a message to your invitation"
-                  rows={3}
-                  className="w-full p-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="p-5 bg-neutral-50 flex justify-end gap-3 rounded-b-lg">
-              <button
-                onClick={() => setIsInviteModalOpen(false)}
-                className="px-4 py-2 border border-neutral-300 rounded-md text-neutral-700 hover:bg-neutral-100 transition-colors"
-              >
-                Cancel
-              </button>
-              <button className="btn-primary">Send Invitation</button>
-            </div>
-          </motion.div>
-        </div>
+        <InviteMembersModal
+          setIsInviteModalOpen={setIsInviteModalOpen}
+          boardId={board.id}
+          boardName={board.name}
+          senderName={session!.user!.name!}
+        />
       )}
     </div>
   );
