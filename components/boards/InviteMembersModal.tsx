@@ -7,12 +7,10 @@ import { sendInviteEmail } from "@/lib/services/boards";
 import { useParams } from "next/navigation";
 import { Role } from "@prisma/client";
 import { toast } from "react-toastify";
+import { useBoardContext } from "@/context/BoardContext";
 
 interface InviteMembersModalProps {
   setIsInviteModalOpen: (isOpen: boolean) => void;
-  boardId: string;
-  boardName: string;
-  senderName: string;
 }
 
 const getGravatarUrl = (email: string) => {
@@ -25,9 +23,6 @@ type EmailWithAvatar = {
 };
 const InviteMembersModal = ({
   setIsInviteModalOpen,
-  boardId,
-  boardName,
-  senderName,
 }: InviteMembersModalProps) => {
   const [emails, setEmails] = useState<EmailWithAvatar[]>([]);
   const [role, setRole] = useState<Role>("VIEWER");
@@ -35,7 +30,9 @@ const InviteMembersModal = ({
   const [loading, setLoading] = useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const { id } = useParams();
+  const { board } = useBoardContext();
   if (!id) return null;
+
   const handleOnInvite = async () => {
     if (emails.length === 0) {
       return;
@@ -43,10 +40,10 @@ const InviteMembersModal = ({
     setLoading(true);
     const response = await sendInviteEmail(
       emails.map((item) => item.email),
-      boardId,
-      boardName,
+      board.id,
+      board.name,
       message,
-      senderName,
+      board.owner?.name || "Board Owner",
       role
     );
     if (response) {
@@ -54,6 +51,7 @@ const InviteMembersModal = ({
       setMessage("");
       setRole("VIEWER");
       setIsInviteModalOpen(false);
+      toast.success("Invitation sent successfully!");
     } else {
       toast.error("Failed to send invitation. Please try again.");
     }

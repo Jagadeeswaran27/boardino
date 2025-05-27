@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import BoardDetails from "@/components/boards/BoardDetails";
+import BoardDetailsWithProvider from "@/components/boards/BoardDetailsWithProvider";
 import { ROUTES } from "@/constants/routes";
 import { getBoard, getColumns } from "@/lib/services/boards";
 import { redirect } from "next/navigation";
@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 interface PageProps {
   params: Promise<{ id: string }>;
 }
-
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
@@ -31,7 +30,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <>
-      <BoardDetails board={board} columns={columns} />
+      <BoardDetailsWithProvider board={board} columns={columns} />
     </>
   );
 }

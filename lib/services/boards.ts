@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { prisma } from "../prisma";
 import { Board, Column, Task } from "@/types/board";
 import { BoardInvitation } from "@prisma/client";
+import { PaginatedListViewTasks, TAB, TAB_TYPE } from "../utils/board";
 
 const url = process.env.NEXT_PUBLIC_URL;
 
@@ -193,7 +194,7 @@ export const getColumns = async (boardId: string): Promise<Column[]> => {
 
 export const addTask = async (
   task: Omit<Task, "id" | "createdAt">
-): Promise<string | null> => {
+): Promise<Task | null> => {
   const response = await fetch(`${url}/api/boards/task/create`, {
     method: "POST",
     headers: {
@@ -205,16 +206,21 @@ export const addTask = async (
     return null;
   }
   const data = (await response.json()) as Task;
-  return data.id;
+  return data;
 };
 
-export const getTasks = async (boardId: string): Promise<Task[]> => {
+export const getTasks = async (
+  boardId: string,
+  tabType: TAB_TYPE,
+  columnId: string,
+  tabName: TAB
+): Promise<Task[]> => {
   const response = await fetch(`${url}/api/boards/task/getAll`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ boardId }),
+    body: JSON.stringify({ boardId, tabType, columnId, tabName }),
   });
   if (!response.ok) {
     return [];
@@ -249,6 +255,48 @@ export const sendInviteEmail = async (
     return false;
   }
   return true;
+};
+
+export const getListViewTasks = async ({
+  cursor,
+}: {
+  cursor?: string;
+}): Promise<PaginatedListViewTasks> => {
+  const params = new URLSearchParams();
+  if (cursor) {
+    params.append("cursor", cursor);
+  }
+  const response = await fetch(
+    `${url}/api/boards/task/getListViewTasks?${params.toString()}`
+  );
+  if (!response.ok) {
+    return {
+      tasks: [],
+      nextCursor: undefined,
+    };
+  }
+  const data = (await response.json()) as PaginatedListViewTasks;
+  return data;
+};
+
+export const updateTask = async (
+  task: Omit<Task, "assignee" | "column">
+): Promise<Task | null> => {
+  const params = new URLSearchParams();
+  params.append("taskId", task.id);
+  const urlWithParams = `${url}/api/boards/task/update?${params.toString()}`;
+  const response = await fetch(urlWithParams, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(task),
+  });
+  if (!response.ok) {
+    return null;
+  }
+  const data = (await response.json()) as Task;
+  return data;
 };
 
 export const getBoardInvitation = async (

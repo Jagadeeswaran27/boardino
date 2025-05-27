@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
 import { createUser } from "@/lib/services/auth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const SignupPage = () => {
   const [name, setName] = useState("");
@@ -25,7 +25,7 @@ const SignupPage = () => {
   const [mounted, setMounted] = useState(false);
   const { status } = useSession();
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = useSearchParams();
   const returnUrl = searchParams.get("returnUrl") || ROUTES.home;
 
   useEffect(() => {

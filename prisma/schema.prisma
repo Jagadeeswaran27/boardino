@@ -61,19 +61,21 @@ model Column {
   boardId   String
   board     Board    @relation(fields: [boardId], references: [id])
   createdAt DateTime @default(now())
+  Task      Task[]
 }
 
 model Task {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   description String
-  columnId    String?
-  assigneeId  String? // optional user assigned to the task
-  assignee    User?    @relation(fields: [assigneeId], references: [id])
-  dueDate     DateTime
-  createdAt   DateTime @default(now())
+  columnId    String
+  assigneeId  String?
+  dueDate     DateTime?
+  createdAt   DateTime  @default(now())
   boardId     String
-  board       Board    @relation(fields: [boardId], references: [id])
+  assignee    User?     @relation(fields: [assigneeId], references: [id])
+  board       Board     @relation(fields: [boardId], references: [id])
+  column      Column    @relation(fields: [columnId], references: [id])
 }
 
 model BoardInvitation {
