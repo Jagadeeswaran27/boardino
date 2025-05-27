@@ -7,7 +7,7 @@ import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { signIn, useSession } from "next-auth/react";
 import { ROUTES } from "@/constants/routes";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [mounted, setMounted] = useState(false);
   const { status } = useSession();
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = useSearchParams();
   const returnUrl = searchParams.get("returnUrl") || ROUTES.home;
 
   useEffect(() => {

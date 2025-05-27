@@ -14,7 +14,7 @@ const BoardsPage = async () => {
 
   return (
     <>
-      <BoardsList boards={boards} />
+      <BoardsList initialBoards={boards} />
     </>
   );
 };

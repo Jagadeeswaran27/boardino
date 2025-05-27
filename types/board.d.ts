@@ -15,4 +15,7 @@ export type Board = PrismaBoard & {
 
 export type Column = PrismaColumn;
 
-export type Task = PrismaTask;
+export type Task = PrismaTask & {
+  column?: Pick<PrismaColumn, "id" | "name">;
+  assignee?: Pick<User, "id" | "name" | "image"> | null;
+};
