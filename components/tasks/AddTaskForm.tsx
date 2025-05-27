@@ -1,44 +1,110 @@
 "use client";
 
-import { User } from "@/types/auth";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import { FaTimes } from "react-icons/fa";
+
 import { addTask } from "@/lib/services/boards";
 import { toast } from "react-toastify";
 import { Task } from "@/types/board";
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import BulletList from "@tiptap/extension-bullet-list";
+import ListItem from "@tiptap/extension-list-item";
+import Link from "@tiptap/extension-link";
+import { FaTimes } from "react-icons/fa";
+import RichTextDescription from "./RichTextDescription";
+import { useBoardContext } from "@/context/BoardContext";
 
 interface AddTaskFormProps {
-  closeModal: () => void;
-  users: Omit<User, "hashedPassword" | "authenticationMethod">[];
   isOpen: boolean;
-  boardId: string;
   columnId: string | null;
   updateTask: (task: Task) => void;
+  closeModal: () => void;
 }
+
+type DescriptionType = "text" | "rich-text";
 const AddTaskForm = ({
-  closeModal,
-  users,
   isOpen,
-  boardId,
   columnId,
   updateTask,
+  closeModal,
 }: AddTaskFormProps) => {
+  const { columns, tabType, board, activeTab } = useBoardContext();
   const [form, setForm] = useState({
     name: "",
     description: "",
     assigneeId: "",
     dueDate: "",
+    columnId: columns[0]?.id,
   });
 
   const [errors, setErrors] = useState({
     name: "",
     description: "",
-    dueDate: "",
   });
 
   const [loading, setIsLoading] = useState(false);
+  const [descriptionType, setDescriptionType] =
+    useState<DescriptionType>("text");
+
+  const users = board.members?.map((member) => member.user) || [];
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {},
+        orderedList: {},
+      }),
+      BulletList.configure({
+        keepMarks: true,
+        keepAttributes: false,
+      }),
+      ListItem,
+      Link.configure({
+        openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        HTMLAttributes: {
+          class: "text-blue-500 underline cursor-pointer",
+          rel: "noopener noreferrer nofollow",
+          target: "_blank",
+        },
+      }),
+    ],
+    content: form.description || "<p></p>",
+    onUpdate: ({ editor }) => {
+      const html = editor.getHTML();
+      setForm((prevForm) => ({ ...prevForm, description: html }));
+      if (errors.description) {
+        setErrors((prevErrors) => ({ ...prevErrors, description: "" }));
+      }
+    },
+    editorProps: {
+      attributes: {
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-xl focus:outline-none min-h-[100px] p-2 border border-neutral-300 rounded-b-md",
+      },
+    },
+  });
+
+  // Reset editor when form is opened
+  useEffect(() => {
+    if (editor && isOpen) {
+      editor.commands.setContent(form.description || "<p></p>");
+    }
+  }, [isOpen, editor, form.description]);
+
+  // Sync between plain text and rich text editor
+  useEffect(() => {
+    if (editor && descriptionType === "rich-text") {
+      const content = form.description || "<p></p>";
+      // Only update if current content is different to avoid focus issues
+      if (editor.getHTML() !== content) {
+        editor.commands.setContent(content);
+      }
+    }
+  }, [descriptionType, form.description, editor]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -47,7 +113,10 @@ const AddTaskForm = ({
   ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
 
-    if (errors[e.target.name as keyof typeof errors]) {
+    if (
+      errors[e.target.name as keyof typeof errors] &&
+      e.target.name !== "description"
+    ) {
       setErrors({
         ...errors,
         [e.target.name]: "",
@@ -57,28 +126,21 @@ const AddTaskForm = ({
 
   const validateForm = () => {
     let valid = true;
-    const newErrors = { ...errors };
+    const newErrors = { name: "", description: "" };
 
     if (!form.name.trim()) {
       newErrors.name = "Task name is required";
       valid = false;
     }
 
-    if (!form.description.trim()) {
-      newErrors.description = "Description should be at least 5 characters";
-      valid = false;
-    }
-
-    if (!form.dueDate) {
-      newErrors.dueDate = "Due date is required";
-      valid = false;
+    if (descriptionType === "rich-text") {
+      if (!editor || editor.getText().trim().length < 5) {
+        newErrors.description = "Description should be at least 5 characters";
+        valid = false;
+      }
     } else {
-      const selectedDate = new Date(form.dueDate);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      if (selectedDate < today) {
-        newErrors.dueDate = "Due date cannot be in the past";
+      if (form.description.trim().length < 5) {
+        newErrors.description = "Description should be at least 5 characters";
         valid = false;
       }
     }
@@ -95,24 +157,51 @@ const AddTaskForm = ({
     const taskData = {
       name: form.name,
       description: form.description,
-      columnId,
+      columnId:
+        tabType === "Kanban View" || tabType === "List View"
+          ? form.columnId
+          : columnId,
       assigneeId: form.assigneeId === "" ? null : form.assigneeId,
-      dueDate: new Date(form.dueDate),
-      boardId,
-    };
-    const addedTaskId = await addTask(taskData);
+      dueDate: form.dueDate.trim().length > 0 ? form.dueDate : null,
+      boardId: board.id,
+    } as Task;
+    const addedTask = await addTask(taskData);
 
-    if (!addedTaskId) {
+    if (!addedTask) {
       toast.error("Failed to add task");
       return;
     }
-    updateTask({
-      ...taskData,
-      id: addedTaskId,
-      createdAt: new Date(),
-    });
+
+    updateTask(addedTask);
     setIsLoading(false);
     closeModal();
+  };
+
+  const canDueDateShown =
+    (tabType === "Kanban View" && activeTab !== "To Do") ||
+    tabType === "Column View" ||
+    tabType === "List View";
+
+  // Toggle function for description type
+  const toggleDescriptionType = (type: DescriptionType) => {
+    if (type === descriptionType) return;
+
+    // Convert content when switching modes
+    if (type === "rich-text" && editor) {
+      // Plain text to rich text - wrap in paragraph tags if needed
+      const textContent = form.description.trim();
+      if (textContent && !textContent.startsWith("<")) {
+        const htmlContent = `<p>${textContent.replace(/\n/g, "</p><p>")}</p>`;
+        editor.commands.setContent(htmlContent);
+        setForm((prev) => ({ ...prev, description: htmlContent }));
+      }
+    } else if (type === "text" && editor) {
+      // Rich text to plain text - extract just the text content
+      const plainText = editor.getText();
+      setForm((prev) => ({ ...prev, description: plainText }));
+    }
+
+    setDescriptionType(type);
   };
 
   return (
@@ -171,29 +260,93 @@ const AddTaskForm = ({
                       name="name"
                       value={form.name}
                       onChange={handleChange}
-                      className={`w-full border ${errors.name ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
+                      className={`w-full border ${
+                        errors.name ? "border-red-500" : "border-neutral-300"
+                      } rounded-md px-3 py-2`}
                       placeholder="Task name"
                     />
                     {errors.name && (
                       <p className="mt-1 text-sm text-red-500">{errors.name}</p>
                     )}
                   </div>
+                  {tabType !== "Kanban View" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        htmlFor="columnId"
+                      >
+                        Select Label(Column)
+                        <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="columnId"
+                        name="columnId"
+                        value={form.columnId}
+                        onChange={handleChange}
+                        className="w-full border border-neutral-300 rounded-md px-3 py-2"
+                      >
+                        {columns.map((column) => (
+                          <option key={column.id} value={column.id}>
+                            {column.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      htmlFor="description"
-                    >
-                      Description<span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      id="description"
-                      name="description"
-                      value={form.description}
-                      onChange={handleChange}
-                      className={`w-full border ${errors.description ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
-                      placeholder="Task description"
-                      rows={3}
-                    />
+                    <div className="flex justify-between items-center mb-1">
+                      <label
+                        className="block text-sm font-medium"
+                        htmlFor="description"
+                      >
+                        Description<span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex rounded-md overflow-hidden border border-neutral-300">
+                        <button
+                          type="button"
+                          onClick={() => toggleDescriptionType("text")}
+                          className={`px-3 py-1 text-xs font-medium cursor-pointer ${
+                            descriptionType === "text"
+                              ? "bg-primary text-white"
+                              : "bg-neutral-50 text-neutral-700 hover:bg-neutral-100"
+                          }`}
+                        >
+                          Plain Text
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => toggleDescriptionType("rich-text")}
+                          className={`px-3 py-1 text-xs font-medium cursor-pointer ${
+                            descriptionType === "rich-text"
+                              ? "bg-primary text-white"
+                              : "bg-neutral-50 text-neutral-700 hover:bg-neutral-100"
+                          }`}
+                        >
+                          Rich Text
+                        </button>
+                      </div>
+                    </div>
+
+                    {descriptionType === "rich-text" ? (
+                      <>
+                        <RichTextDescription editor={editor} />
+                        <EditorContent editor={editor} />
+                      </>
+                    ) : (
+                      <textarea
+                        id="description"
+                        name="description"
+                        value={form.description}
+                        onChange={handleChange}
+                        className={`w-full border ${
+                          errors.description
+                            ? "border-red-500"
+                            : "border-neutral-300"
+                        } rounded-md px-3 py-2 min-h-[150px]`}
+                        placeholder="Enter task description"
+                      />
+                    )}
+
                     {errors.description && (
                       <p className="mt-1 text-sm text-red-500">
                         {errors.description}
@@ -222,27 +375,24 @@ const AddTaskForm = ({
                       ))}
                     </select>
                   </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium mb-1"
-                      htmlFor="dueDate"
-                    >
-                      Due Date<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="dueDate"
-                      name="dueDate"
-                      type="date"
-                      value={form.dueDate}
-                      onChange={handleChange}
-                      className={`w-full border ${errors.dueDate ? "border-red-500" : "border-neutral-300"} rounded-md px-3 py-2`}
-                    />
-                    {errors.dueDate && (
-                      <p className="mt-1 text-sm text-red-500">
-                        {errors.dueDate}
-                      </p>
-                    )}
-                  </div>
+                  {canDueDateShown && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        htmlFor="dueDate"
+                      >
+                        Due Date
+                      </label>
+                      <input
+                        id="dueDate"
+                        name="dueDate"
+                        type="date"
+                        value={form.dueDate}
+                        onChange={handleChange}
+                        className={`w-full border border-neutral-300 rounded-md px-3 py-2`}
+                      />
+                    </div>
+                  )}
                   <div className="flex justify-end gap-2">
                     <button
                       type="button"

@@ -1,42 +1,66 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { MdAdd, MdViewWeek } from "react-icons/md";
+import React, { useEffect, useState, useRef } from "react";
+import { MdAdd, MdViewWeek, MdFilterList } from "react-icons/md";
 import TaskDetail from "../tasks/TaskDetail";
-import { Task } from "@/types/board";
 import AddTaskForm from "../tasks/AddTaskForm";
-import { User } from "@/types/auth";
 import { getTasks } from "@/lib/services/boards";
-import { BoardTabs, getFilteredTasks, Tabs, TABS } from "@/lib/utils/board";
+import { BoardTabs } from "@/lib/utils/board";
 import TasksLoadingSkeleton from "./TasksLoadingSkeleton";
+import Filter from "./Filter";
+import { useBoardContext } from "@/context/BoardContext";
+import { Task } from "@/types/board";
 
 interface ColumnDetailsProps {
-  activeTab: Tabs | string;
-  columnName: string;
   isOwner: boolean;
-  users: Omit<User, "hashedPassword" | "authenticationMethod">[];
-  boardId: string;
 }
 
-const ColumnDetails = ({
-  activeTab,
-  columnName,
-  isOwner,
-  users,
-  boardId,
-}: ColumnDetailsProps) => {
+const ColumnDetails = ({ isOwner }: ColumnDetailsProps) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
+  const filterButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { activeColumn, activeTab, tabType, board } = useBoardContext();
 
   useEffect(() => {
     const handleGetTasks = async () => {
       setLoading(true);
-      const tasks = await getTasks(boardId);
+      const tasks = await getTasks(
+        board.id,
+        tabType,
+        activeColumn ? activeColumn.id : "",
+        activeTab
+      );
       setTasks(tasks);
       setLoading(false);
     };
     handleGetTasks();
-  }, [boardId]);
+  }, [board.id, tabType, activeColumn, activeTab]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(event.target as Node) &&
+        filterButtonRef.current &&
+        !filterButtonRef.current.contains(event.target as Node)
+      ) {
+        setShowFilterDropdown(false);
+      }
+    };
+
+    if (showFilterDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showFilterDropdown]);
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -45,15 +69,30 @@ const ColumnDetails = ({
   const handleCloseModal = () => {
     setShowModal(false);
   };
-
   const updateTasks = (newTask: Task) => {
-    setTasks((prevTasks) => [...prevTasks, newTask]);
+    if (tabType === "Column View" && newTask.dueDate !== null) {
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+    }
   };
-
-  const filteredTasks = getFilteredTasks(tasks, activeTab);
 
   return (
     <div className="lg:w-3/4 w-full">
+      <div className="mb-6 flex justify-between items-center">
+        <h2 className="text-xl font-semibold text-neutral-900">Board Tasks</h2>
+        <div className="relative">
+          <button
+            ref={filterButtonRef}
+            onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+            className="p-2 border border-neutral-200 rounded-md text-sm text-neutral-700 bg-white hover:bg-neutral-50 flex items-center gap-1 cursor-pointer"
+          >
+            <MdFilterList className="text-neutral-600" size={16} />
+            <span>Filters</span>
+          </button>
+          {showFilterDropdown && (
+            <Filter filterDropdownRef={filterDropdownRef} />
+          )}
+        </div>
+      </div>
       {activeTab && (
         <div className="grid grid-cols-1 gap-4">
           <div
@@ -63,16 +102,18 @@ const ColumnDetails = ({
             <h3 className="font-medium text-neutral-900 mb-4 flex items-center justify-between">
               <div className="flex items-center">
                 <MdViewWeek className="text-accent mr-2" size={20} />
-                <span className="text-lg">{columnName}</span>
-                {!loading && filteredTasks.length > 0 && (
+                <span className="text-lg">
+                  {tabType === "Kanban View" ? activeTab : activeColumn?.name}
+                </span>
+                {!loading && tasks.length > 0 && (
                   <span className="ml-3 text-xs bg-primary-glow text-primary py-1 px-3 rounded-full font-bold">
-                    {filteredTasks.length} tasks
+                    {tasks.length} tasks
                   </span>
                 )}
               </div>
               {isOwner && activeTab !== BoardTabs.COMPLETED && (
                 <button
-                  className="bg-primary text-white p-1.5 rounded-md hover:bg-primary-dark flex items-center gap-1 px-3"
+                  className="bg-primary text-white p-1.5 rounded-md hover:bg-primary-dark flex items-center gap-1 px-3 cursor-pointer"
                   onClick={handleOpenModal}
                   disabled={loading}
                 >
@@ -85,16 +126,10 @@ const ColumnDetails = ({
             <div className="max-h-[calc(100vh-220px)] overflow-y-auto pr-1 transition-opacity duration-300">
               {loading ? (
                 <TasksLoadingSkeleton />
-              ) : filteredTasks.length > 0 ? (
+              ) : tasks.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredTasks.map((task) => (
-                    <TaskDetail
-                      key={task.id}
-                      task={task}
-                      assignee={users.find(
-                        (user) => user.id === task.assigneeId
-                      )}
-                    />
+                  {tasks.map((task) => (
+                    <TaskDetail key={task.id} task={task} />
                   ))}
                 </div>
               ) : (
@@ -121,12 +156,10 @@ const ColumnDetails = ({
       {/* Modal for adding a new task */}
       {showModal && (
         <AddTaskForm
-          closeModal={handleCloseModal}
-          users={users}
           isOpen={showModal}
-          boardId={boardId}
-          columnId={TABS.includes(activeTab) ? null : activeTab}
+          columnId={tabType === "Column View" ? activeColumn!.id : ""}
           updateTask={updateTasks}
+          closeModal={handleCloseModal}
         />
       )}
     </div>

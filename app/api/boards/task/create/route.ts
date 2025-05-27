@@ -8,7 +8,7 @@ export async function POST(request: Request) {
     const { name, description, columnId, assigneeId, dueDate, boardId } =
       body as Task;
 
-    if (!name || !description || !dueDate || !boardId) {
+    if (!name || !description || !boardId) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -19,10 +19,25 @@ export async function POST(request: Request) {
       data: {
         name,
         description,
-        dueDate: new Date(dueDate),
-        assigneeId: assigneeId,
-        columnId: columnId,
+        dueDate: dueDate ? new Date(dueDate) : null,
+        assigneeId,
+        columnId,
         boardId,
+      },
+      include: {
+        column: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        assignee: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
       },
     });
 

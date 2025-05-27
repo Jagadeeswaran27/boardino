@@ -1,13 +1,19 @@
 import { Task } from "@/types/board";
 
-export type Tabs = "In Progress" | "Completed";
-export const TABS: string[] = ["In Progress", "Completed"];
+export type TAB = "To Do" | "In Progress" | "Completed";
+export const TABS: TAB[] = ["To Do", "In Progress", "Completed"];
+export type TAB_TYPE = "Column View" | "Kanban View" | "List View";
+export const TAB_TYPES: TAB_TYPE[] = [
+  "Column View",
+  "Kanban View",
+  "List View",
+];
 export enum BoardTabs {
   IN_PROGRESS = "In Progress",
   COMPLETED = "Completed",
 }
 
-export const getFilteredTasks = (t: Task[], activeTab: string) => {
+export const getKanbanFilteredTasks = (t: Task[], activeTab: string) => {
   if (t.length === 0) return [];
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -35,4 +41,9 @@ export const getFilteredTasks = (t: Task[], activeTab: string) => {
         return task.columnId === activeTab;
       });
   }
+};
+
+export type PaginatedListViewTasks = {
+  tasks: Task[];
+  nextCursor: string | undefined;
 };
