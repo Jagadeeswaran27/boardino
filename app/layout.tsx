@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import { SessionProvider } from "next-auth/react";
 import { auth } from "@/auth";
 import "react-toastify/dist/ReactToastify.css";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,7 @@ const RootLayout = async ({
             draggable
             pauseOnHover
           />
+          <Analytics />
         </body>
       </SessionProvider>
     </html>
