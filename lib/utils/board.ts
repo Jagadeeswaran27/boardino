@@ -13,6 +13,18 @@ export enum BoardTabs {
   COMPLETED = "Completed",
 }
 
+export type Filter = {
+  userId: string;
+  columnId: string;
+  createdDate: {
+    from: Date;
+    to: Date;
+  } | null;
+  dueDate: {
+    from: Date;
+    to: Date;
+  } | null;
+};
 export const getKanbanFilteredTasks = (t: Task[], activeTab: string) => {
   if (t.length === 0) return [];
   const today = new Date();

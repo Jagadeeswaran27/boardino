@@ -1,4 +1,4 @@
-import { TAB, TAB_TYPE, TAB_TYPES } from "@/lib/utils/board";
+import { Filter, TAB, TAB_TYPE, TAB_TYPES } from "@/lib/utils/board";
 import { Board, Column } from "@/types/board";
 import { useSearchParams } from "next/navigation";
 import { createContext, useState, useContext } from "react";
@@ -9,12 +9,14 @@ interface BoardContextProps {
   activeColumn: Column | undefined;
   columns: Column[];
   tabType: TAB_TYPE;
+  filter: Filter;
   setActiveTab: (tab: TAB) => void;
   setActiveColumn: (column: Column | undefined) => void;
   setColumns: (
     newColumns: Column[] | ((prevColumns: Column[]) => Column[])
   ) => void;
   updateTabType: (newType: TAB_TYPE) => void;
+  setFilter: React.Dispatch<React.SetStateAction<Filter>>;
 }
 
 export const BoardContext = createContext<BoardContextProps | undefined>(
@@ -46,6 +48,12 @@ export const BoardProvider = ({
     initialContext.columns[0]
   );
   const [columns, setColumns] = useState(initialContext.columns);
+  const [filter, setFilter] = useState<Filter>({
+    userId: "",
+    columnId: "",
+    createdDate: null,
+    dueDate: null,
+  });
   const searchParams = useSearchParams();
 
   const tabType = searchParams.get("view") as TAB_TYPE;
@@ -68,6 +76,8 @@ export const BoardProvider = ({
         activeColumn,
         columns,
         tabType,
+        filter,
+        setFilter,
         setActiveColumn,
         setActiveTab,
         setColumns,
