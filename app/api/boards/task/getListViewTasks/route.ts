@@ -5,9 +5,21 @@ const LIMIT = 5;
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const cursor = searchParams.get("cursor");
+  const boardId = searchParams.get("boardId");
+  if (!boardId) {
+    return new Response(JSON.stringify({ error: "Board ID is required" }), {
+      status: 400,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  }
 
   try {
     const tasks = await prisma.task.findMany({
+      where: {
+        boardId: boardId,
+      },
       take: LIMIT + 1,
       orderBy: {
         id: "desc",
@@ -18,6 +30,7 @@ export async function GET(req: Request) {
           id: cursor,
         },
       }),
+
       include: {
         column: {
           select: {

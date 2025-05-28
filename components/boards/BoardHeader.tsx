@@ -1,6 +1,7 @@
 import { ROUTES } from "@/constants/routes";
 import { useBoardContext } from "@/context/BoardContext";
 import { TABS } from "@/lib/utils/board";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useRef } from "react";
 import { HiOutlineViewBoards } from "react-icons/hi";
@@ -13,7 +14,6 @@ import { MdAdd, MdArrowBack, MdClose, MdEdit } from "react-icons/md";
 import { TbLayoutKanban } from "react-icons/tb";
 
 interface BoardHeaderProps {
-  isOwner: boolean;
   isAddingColumn: boolean;
   setIsInviteModalOpen: (open: boolean) => void;
   setIsAddingColumn: (open: boolean) => void;
@@ -22,7 +22,6 @@ interface BoardHeaderProps {
 }
 
 const BoardHeader = ({
-  isOwner,
   isAddingColumn,
   setIsInviteModalOpen,
   setIsAddingColumn,
@@ -41,6 +40,15 @@ const BoardHeader = ({
     columns,
     tabType,
   } = useBoardContext();
+
+  const { data } = useSession();
+
+  const isOwner = board.ownerId === data?.user?.id;
+  const isEditor = board.members?.find(
+    (member) => member.userId === data?.user?.id && member.role === "EDITOR"
+  );
+
+  const canAddColumn = isOwner || isEditor;
 
   return (
     <div
@@ -82,13 +90,15 @@ const BoardHeader = ({
               <span>{tabType}</span>
               <IoSettingsOutline size={16} className="text-neutral-500" />
             </button>
-            <button
-              onClick={() => setIsInviteModalOpen(true)}
-              className="btn-primary flex items-center gap-1"
-            >
-              <MdAdd size={18} />
-              <span>Invite</span>
-            </button>
+            {isOwner && (
+              <button
+                onClick={() => setIsInviteModalOpen(true)}
+                className="btn-primary flex items-center gap-1"
+              >
+                <MdAdd size={18} />
+                <span>Invite</span>
+              </button>
+            )}
           </div>
         </div>
 
@@ -159,7 +169,7 @@ const BoardHeader = ({
                   </button>
                 </div>
               ) : (
-                isOwner && (
+                canAddColumn && (
                   <button
                     onClick={() => setIsAddingColumn(true)}
                     className="px-4 py-2 flex items-center gap-1 text-sm font-medium text-neutral-600 hover:text-neutral-900 border-b-2 border-transparent -mb-px cursor-pointer"
