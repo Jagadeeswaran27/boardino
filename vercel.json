@@ -1,3 +1,6 @@
 {
-  "ignoreCommand": "if [ \"$VERCEL_GIT_BRANCH\" != \"main\" ]; then exit 1; fi"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "github": {
+    "autoJobCancelation": false
+  }
 }
