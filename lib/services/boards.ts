@@ -258,14 +258,17 @@ export const sendInviteEmail = async (
 };
 
 export const getListViewTasks = async ({
+  boardId,
   cursor,
 }: {
+  boardId: string;
   cursor?: string;
 }): Promise<PaginatedListViewTasks> => {
   const params = new URLSearchParams();
   if (cursor) {
     params.append("cursor", cursor);
   }
+  params.append("boardId", boardId);
   const response = await fetch(
     `${url}/api/boards/task/getListViewTasks?${params.toString()}`
   );

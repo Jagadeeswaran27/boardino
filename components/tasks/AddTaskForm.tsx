@@ -88,18 +88,15 @@ const AddTaskForm = ({
     },
   });
 
-  // Reset editor when form is opened
   useEffect(() => {
     if (editor && isOpen) {
       editor.commands.setContent(form.description || "<p></p>");
     }
   }, [isOpen, editor, form.description]);
 
-  // Sync between plain text and rich text editor
   useEffect(() => {
     if (editor && descriptionType === "rich-text") {
       const content = form.description || "<p></p>";
-      // Only update if current content is different to avoid focus issues
       if (editor.getHTML() !== content) {
         editor.commands.setContent(content);
       }

@@ -8,11 +8,23 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: [
-      "avatars.githubusercontent.com",
-      "lh3.googleusercontent.com",
-      "api.dicebear.com",
-      "www.gravatar.com",
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "api.dicebear.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.gravatar.com",
+      },
     ],
   },
 };

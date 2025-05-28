@@ -1,66 +1,37 @@
 "use client";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
 import { MdAdd, MdViewWeek, MdFilterList } from "react-icons/md";
 import TaskDetail from "../tasks/TaskDetail";
 import AddTaskForm from "../tasks/AddTaskForm";
-import { getTasks } from "@/lib/services/boards";
 import { BoardTabs } from "@/lib/utils/board";
 import TasksLoadingSkeleton from "./TasksLoadingSkeleton";
 import Filter from "./Filter";
 import { useBoardContext } from "@/context/BoardContext";
-import { Task } from "@/types/board";
+import { useColumnDropdown } from "@/hooks/board/column/useColumnDropdown";
+import { useColumnTasks } from "@/hooks/board/column/useColumnTasks";
+import { useSession } from "next-auth/react";
 
-interface ColumnDetailsProps {
-  isOwner: boolean;
-}
-
-const ColumnDetails = ({ isOwner }: ColumnDetailsProps) => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+const ColumnDetails = () => {
   const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-  const filterDropdownRef = useRef<HTMLDivElement>(null);
-  const filterButtonRef = useRef<HTMLButtonElement>(null);
+
+  const { data } = useSession();
 
   const { activeColumn, activeTab, tabType, board } = useBoardContext();
+  const {
+    filterButtonRef,
+    filterDropdownRef,
+    showFilterDropdown,
+    setShowFilterDropdown,
+  } = useColumnDropdown();
 
-  useEffect(() => {
-    const handleGetTasks = async () => {
-      setLoading(true);
-      const tasks = await getTasks(
-        board.id,
-        tabType,
-        activeColumn ? activeColumn.id : "",
-        activeTab
-      );
-      setTasks(tasks);
-      setLoading(false);
-    };
-    handleGetTasks();
-  }, [board.id, tabType, activeColumn, activeTab]);
+  const { loading, tasks, updateTasks } = useColumnTasks();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        filterDropdownRef.current &&
-        !filterDropdownRef.current.contains(event.target as Node) &&
-        filterButtonRef.current &&
-        !filterButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowFilterDropdown(false);
-      }
-    };
+  const isOwner = board.ownerId === data?.user?.id;
+  const isEditor = board.members?.find(
+    (member) => member.userId === data?.user?.id && member.role === "EDITOR"
+  );
 
-    if (showFilterDropdown) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showFilterDropdown]);
+  const canAddTask = isOwner || isEditor;
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -69,14 +40,9 @@ const ColumnDetails = ({ isOwner }: ColumnDetailsProps) => {
   const handleCloseModal = () => {
     setShowModal(false);
   };
-  const updateTasks = (newTask: Task) => {
-    if (tabType === "Column View" && newTask.dueDate !== null) {
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-    }
-  };
 
   return (
-    <div className="lg:w-3/4 w-full">
+    <div className="lg:w-[90%] w-full">
       <div className="mb-6 flex justify-between items-center">
         <h2 className="text-xl font-semibold text-neutral-900">Board Tasks</h2>
         <div className="relative">
@@ -111,7 +77,7 @@ const ColumnDetails = ({ isOwner }: ColumnDetailsProps) => {
                   </span>
                 )}
               </div>
-              {isOwner && activeTab !== BoardTabs.COMPLETED && (
+              {canAddTask && activeTab !== "Completed" && (
                 <button
                   className="bg-primary text-white p-1.5 rounded-md hover:bg-primary-dark flex items-center gap-1 px-3 cursor-pointer"
                   onClick={handleOpenModal}
@@ -153,7 +119,6 @@ const ColumnDetails = ({ isOwner }: ColumnDetailsProps) => {
         </div>
       )}
 
-      {/* Modal for adding a new task */}
       {showModal && (
         <AddTaskForm
           isOpen={showModal}
