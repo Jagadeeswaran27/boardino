@@ -63,7 +63,15 @@ const InviteMembersModal = ({
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && event.shiftKey) {
       event.preventDefault();
+
       const email = event.currentTarget.value;
+      if (
+        board.members &&
+        board.members.some((member) => member.user.email === email)
+      ) {
+        toast.error("This email is already a member of the board.");
+        return;
+      }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return;

@@ -254,7 +254,6 @@ export const sendInviteEmail = async (
     }),
   });
 
-  console.log("Response from sendInviteEmail:", response);
   if (!response.ok) {
     return false;
   }

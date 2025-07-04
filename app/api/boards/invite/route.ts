@@ -125,44 +125,41 @@ export async function POST(request: Request) {
         where: {
           boardId,
           email,
+          AND: {
+            status: "PENDING",
+          },
         },
       });
 
-      console.log("Existing Invitation:", existingInvitation);
-
-      if (existingInvitation) {
-        return NextResponse.json(`Invitation already exists for ${email}`, {
-          status: 400,
+      if (!existingInvitation) {
+        const boardInvitation = await prisma.boardInvitation.create({
+          data: {
+            boardId,
+            email,
+            role,
+            status: "PENDING",
+            expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          },
         });
-      }
 
-      const boardInvitation = await prisma.boardInvitation.create({
-        data: {
+        const htmlContent = createInviteEmailHTML({
+          boardInvitationId: boardInvitation.id,
+          boardName,
           boardId,
-          email,
+          message,
+          senderName,
           role,
-          status: "PENDING",
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        },
-      });
+        });
 
-      const htmlContent = createInviteEmailHTML({
-        boardInvitationId: boardInvitation.id,
-        boardName,
-        boardId,
-        message,
-        senderName,
-        role,
-      });
+        const mailOptions = {
+          from: `Boardino-Admin <jagadeeswaran2705@gmail.com>`,
+          to: email,
+          subject: `You've been invited to join the ${boardName} board`,
+          html: htmlContent,
+        };
 
-      const mailOptions = {
-        from: `Boardino-Admin <jagadeeswaran2705@gmail.com>`,
-        to: email,
-        subject: `You've been invited to join the ${boardName} board`,
-        html: htmlContent,
-      };
-
-      await transporter.sendMail(mailOptions);
+        await transporter.sendMail(mailOptions);
+      }
     });
 
     return NextResponse.json("Email sent successfully", { status: 200 });
