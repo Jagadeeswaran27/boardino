@@ -130,7 +130,7 @@ export async function POST(request: Request) {
       return NextResponse.json("Email is required", { status: 400 });
     }
 
-    email.forEach(async (email) => {
+    const emailPromises = email.map(async (email) => {
       const existingInvitation = await prisma.boardInvitation.findFirst({
         where: {
           boardId,
@@ -173,6 +173,8 @@ export async function POST(request: Request) {
         await transporter.sendMail(mailOptions);
       }
     });
+
+    await Promise.all(emailPromises);
 
     return NextResponse.json("Email sent successfully", { status: 200 });
   } catch (error) {
