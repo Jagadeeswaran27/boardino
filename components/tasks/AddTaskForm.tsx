@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Dialog, Transition } from "@headlessui/react";
+import { useState, useEffect } from "react";
 import { Fragment } from "react";
 
-import { addTask } from "@/lib/services/boards";
+import { Dialog, Transition } from "@headlessui/react";
 import { toast } from "react-toastify";
-import { Task } from "@/types/board";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import BulletList from "@tiptap/extension-bullet-list";
 import ListItem from "@tiptap/extension-list-item";
 import Link from "@tiptap/extension-link";
 import { FaTimes } from "react-icons/fa";
+
+import { addTask } from "@/lib/services/boards";
+import { Task } from "@/types/board";
 import RichTextDescription from "./RichTextDescription";
 import { useBoardContext } from "@/context/BoardContext";
 

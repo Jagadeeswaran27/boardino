@@ -1,4 +1,5 @@
 "use client";
+
 import { FaPlus, FaSearch } from "react-icons/fa";
 
 interface BoardsHeaderProps {

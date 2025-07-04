@@ -1,11 +1,13 @@
-import { Task } from "@/types/board";
-import React, { useState } from "react";
-import { MdAccessTime, MdCalendarToday } from "react-icons/md";
+import { useState } from "react";
 import Image from "next/image";
+
+import { MdAccessTime, MdCalendarToday } from "react-icons/md";
+
+import { Task } from "@/types/board";
 import { IMAGES } from "@/constants/Images";
-import TaskPopup from "./TaskPopup";
 import { useBoardContext } from "@/context/BoardContext";
 
+import TaskPopup from "./TaskPopup";
 interface TaskDetailProps {
   task: Task;
 }
@@ -74,7 +76,7 @@ const TaskDetail = ({ task }: TaskDetailProps) => {
 
           {task.dueDate && (
             <div
-              className={`flex items-center gap-2 text-xs ${isDueSoon ? "text-yellow-700 bg-red-50" : isPastDue ? "text-white bg-red-500" : "text-neutral-600 bg-neutral-50"} p-1.5 pl-2 rounded-md`}
+              className={`flex items-center gap-2 text-xs ${isDueSoon ? "text-yellow-700 bg-red-50" : isPastDue ? "text-white bg-red-400" : "text-neutral-600 bg-neutral-50"} p-1.5 pl-2 rounded-md`}
             >
               <MdAccessTime
                 className={

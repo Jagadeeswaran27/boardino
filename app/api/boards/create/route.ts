@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+
 import { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+
 import { Board } from "@/types/board";
 
 export async function POST(request: Request) {

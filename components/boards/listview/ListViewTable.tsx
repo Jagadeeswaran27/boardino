@@ -1,8 +1,8 @@
+import Image from "next/image";
+
 import { useBoardContext } from "@/context/BoardContext";
 import { formatDate } from "@/lib/utils/date";
 import { Task } from "@/types/board";
-import Image from "next/image";
-import React from "react";
 
 interface ListViewTableProps {
   listViewTasks: Task[];

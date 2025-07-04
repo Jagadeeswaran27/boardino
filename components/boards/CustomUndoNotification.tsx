@@ -1,7 +1,8 @@
 "use client";
 
-import { Board } from "@/types/board";
 import { FaTimes, FaUndo } from "react-icons/fa";
+
+import { Board } from "@/types/board";
 
 interface CustomUndoNotificationProps {
   showUndoNotification: boolean;

@@ -1,15 +1,19 @@
 "use client";
+
 import React, { useState } from "react";
+
 import { MdAdd, MdViewWeek, MdFilterList } from "react-icons/md";
-import TaskDetail from "../tasks/TaskDetail";
-import AddTaskForm from "../tasks/AddTaskForm";
+import { useSession } from "next-auth/react";
+
 import { BoardTabs } from "@/lib/utils/board";
-import TasksLoadingSkeleton from "./TasksLoadingSkeleton";
-import Filter from "./Filter";
 import { useBoardContext } from "@/context/BoardContext";
 import { useColumnDropdown } from "@/hooks/board/column/useColumnDropdown";
 import { useColumnTasks } from "@/hooks/board/column/useColumnTasks";
-import { useSession } from "next-auth/react";
+
+import TaskDetail from "../tasks/TaskDetail";
+import AddTaskForm from "../tasks/AddTaskForm";
+import TasksLoadingSkeleton from "./TasksLoadingSkeleton";
+import Filter from "./Filter";
 
 const ColumnDetails = () => {
   const [showModal, setShowModal] = useState(false);

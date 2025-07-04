@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { Fragment } from "react";
+
 import { FaTimes } from "react-icons/fa";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment } from "react";
-import { createBoard } from "@/lib/services/boards";
 import { useSession } from "next-auth/react";
-import { Board } from "@/types/board";
 import { toast } from "react-toastify";
+
+import { createBoard } from "@/lib/services/boards";
+import { Board } from "@/types/board";
 
 interface CreateBoardModalProps {
   isOpen: boolean;

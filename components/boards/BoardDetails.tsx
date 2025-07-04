@@ -1,14 +1,17 @@
 "use client";
-import { Column } from "@/types/board";
+
 import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
+
+import { Column } from "@/types/board";
 import { createColumn } from "@/lib/services/boards";
+import { useBoardContext } from "@/context/BoardContext";
+
 import ColumnDetails from "../columns/ColumnDetails";
 import InviteMembersModal from "./InviteMembersModal";
 import BoardHeader from "./BoardHeader";
 import ViewDrawer from "./ViewDrawer";
 import BoardInfo from "./BoardInfo";
-import { useBoardContext } from "@/context/BoardContext";
 import ListView from "./listview/ListView";
 
 const BoardDetails = () => {
@@ -62,7 +65,7 @@ const BoardDetails = () => {
         setIsViewDrawerOpen={setIsViewDrawerOpen}
       />
 
-      <div className="container mx-auto px-4 py-6 max-w-7xl">
+      <div className="container mx-auto py-6 max-w-[90%]">
         <div className="flex lg:flex-row flex-col justify-center  gap-6">
           {tabType === "List View" ? (
             <>

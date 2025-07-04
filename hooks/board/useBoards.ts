@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { deleteBoard } from "@/lib/services/boards";
+import { useSearchParams } from "next/navigation";
+
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
+
+import { deleteBoard } from "@/lib/services/boards";
 import { Board } from "@/types/board";
 
 export const useBoards = (initialBoards: Board[]) => {
   const [boards, setBoards] = useState<Board[]>(initialBoards);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [recentlyDeleted, setRecentlyDeleted] = useState<{
     board: Board;
     index: number;
@@ -14,6 +18,14 @@ export const useBoards = (initialBoards: Board[]) => {
   const [notificationTimer, setNotificationTimer] =
     useState<NodeJS.Timeout | null>(null);
   const { data } = useSession();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref === "create-board") {
+      setIsModalOpen(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     return () => {
@@ -107,6 +119,8 @@ export const useBoards = (initialBoards: Board[]) => {
     boards,
     recentlyDeleted,
     showUndoNotification,
+    isModalOpen,
+    setIsModalOpen,
     updateBoardList,
     handleDeleteBoard,
     handleUndoDelete,

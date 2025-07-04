@@ -1,8 +1,10 @@
-import { BoardInvitation } from "@prisma/client";
-import React from "react";
-import { FaUserSlash } from "react-icons/fa";
-import SignoutAndSwitchAccountsButtons from "../buttons/SignoutAndSwitchAccountsButtons";
 import { Session } from "next-auth";
+import React from "react";
+
+import { BoardInvitation } from "@prisma/client";
+import { FaUserSlash } from "react-icons/fa";
+
+import SignoutAndSwitchAccountsButtons from "../buttons/SignoutAndSwitchAccountsButtons";
 
 interface NotAuthorizedCardProps {
   boardInvitation: BoardInvitation;
@@ -18,7 +20,6 @@ const NotAuthorizedCard = ({
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-section-bg-start to-section-bg-end p-4">
       <div className="bg-white rounded-xl shadow-lg border border-neutral-100 max-w-md w-full p-0 overflow-hidden card-shadow transition-all">
-        {/* Card Header */}
         <div className="bg-gradient-to-r from-primary/15 to-accent/15 px-8 py-10 flex flex-col items-center">
           <div className="bg-white/80 p-4 rounded-full mb-5 shadow-sm">
             <FaUserSlash className="text-3xl text-error" />
@@ -31,7 +32,6 @@ const NotAuthorizedCard = ({
           </p>
         </div>
 
-        {/* Card Content */}
         <div className="px-8 py-8">
           <div className="bg-neutral-50 rounded-lg p-5 mb-6 border border-neutral-100">
             <p className="text-base font-medium text-neutral-700 leading-relaxed mb-3">

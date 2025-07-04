@@ -1,7 +1,8 @@
-import { Filter, TAB, TAB_TYPE, TAB_TYPES } from "@/lib/utils/board";
-import { Board, Column } from "@/types/board";
 import { useSearchParams } from "next/navigation";
 import { createContext, useState, useContext } from "react";
+
+import { Filter, TAB, TAB_TYPE, TAB_TYPES } from "@/lib/utils/board";
+import { Board, Column } from "@/types/board";
 
 interface BoardContextProps {
   board: Board;
@@ -17,6 +18,7 @@ interface BoardContextProps {
   ) => void;
   updateTabType: (newType: TAB_TYPE) => void;
   setFilter: React.Dispatch<React.SetStateAction<Filter>>;
+  modifyBoardName: (newName: string) => void;
 }
 
 export const BoardContext = createContext<BoardContextProps | undefined>(
@@ -43,6 +45,7 @@ export const BoardProvider = ({
   initialContext,
   children,
 }: BoardProviderProps) => {
+  const [board, setBoard] = useState<Board>(initialContext.board);
   const [activeTab, setActiveTab] = useState<TAB>("To Do");
   const [activeColumn, setActiveColumn] = useState<Column | undefined>(
     initialContext.columns[0]
@@ -68,10 +71,17 @@ export const BoardProvider = ({
     history.pushState(null, "", `?${params.toString()}`);
   };
 
+  const modifyBoardName = (newName: string) => {
+    setBoard((prevBoard) => ({
+      ...prevBoard,
+      name: newName.trim(),
+    }));
+  };
+
   return (
     <BoardContext.Provider
       value={{
-        board: initialContext.board,
+        board,
         activeTab,
         activeColumn,
         columns,
@@ -82,6 +92,7 @@ export const BoardProvider = ({
         setActiveTab,
         setColumns,
         updateTabType,
+        modifyBoardName,
       }}
     >
       {children}

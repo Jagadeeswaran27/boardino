@@ -1,11 +1,13 @@
 "use client";
 
-import { ROUTES } from "@/constants/routes";
-import { acceptBoardInvitation } from "@/lib/services/boards";
-import { BoardInvitation } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 import { toast } from "react-toastify";
+import { BoardInvitation } from "@prisma/client";
+
+import { ROUTES } from "@/constants/routes";
+import { acceptBoardInvitation } from "@/lib/services/boards";
 
 interface AcceptInvitationButtonProps {
   boardInvitation: BoardInvitation;

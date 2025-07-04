@@ -1,10 +1,11 @@
 import NextAuth, { User } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import { addUserInfo } from "./lib/services/auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "./lib/prisma";
 import bcrypt from "bcryptjs";
+
+import { addUserInfo } from "./lib/services/auth";
+import { prisma } from "./lib/prisma";
 import { authenticationMethod } from "./types/auth";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

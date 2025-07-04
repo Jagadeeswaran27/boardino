@@ -1,6 +1,8 @@
 "use client";
+
 import { BoardProvider } from "@/context/BoardContext";
 import { Board, Column } from "@/types/board";
+
 import BoardDetails from "./BoardDetails";
 
 interface BoardDetailsWithProviderProps {

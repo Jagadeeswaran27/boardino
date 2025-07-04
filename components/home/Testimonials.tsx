@@ -1,5 +1,3 @@
-import React from "react";
-
 const Testimonials = () => {
   return (
     <section id="testimonials" className="py-16 md:py-24">

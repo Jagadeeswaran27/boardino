@@ -1,10 +1,12 @@
 "use client";
+import Image from "next/image";
+
+import { useSession } from "next-auth/react";
+import { MdAccessTime, MdAdd, MdPeopleOutline } from "react-icons/md";
+
 import { IMAGES } from "@/constants/Images";
 import { useBoardContext } from "@/context/BoardContext";
 import { formatDate } from "@/lib/utils/date";
-import { useSession } from "next-auth/react";
-import Image from "next/image";
-import { MdAccessTime, MdAdd, MdPeopleOutline } from "react-icons/md";
 
 interface BoardInfoProps {
   setIsInviteModalOpen: (open: boolean) => void;
@@ -48,11 +50,11 @@ const BoardInfo = ({ setIsInviteModalOpen }: BoardInfoProps) => {
 
         {/* Members List */}
         <div className="p-4">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-3 ">
             <h3 className="font-medium text-neutral-900">Members</h3>
             <button
               onClick={() => setIsInviteModalOpen(true)}
-              className="text-primary hover:text-primary-dark text-sm flex items-center gap-1"
+              className="text-primary cursor-pointer hover:underline hover:text-primary-dark text-sm flex items-center"
             >
               <MdAdd size={16} />
               <span>Invite</span>

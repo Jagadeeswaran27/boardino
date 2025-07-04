@@ -1,5 +1,9 @@
 "use client";
-import { Board } from "@/types/board";
+
+import { useEffect, useState, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+
 import {
   MdMoreVert,
   MdPeopleOutline,
@@ -9,12 +13,11 @@ import {
   MdDelete,
 } from "react-icons/md";
 import { motion } from "framer-motion";
-import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
+import { useSession } from "next-auth/react";
+
 import { IMAGES } from "@/constants/Images";
 import { formatDate } from "@/lib/utils/date";
-import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { Board } from "@/types/board";
 import { ROUTES } from "@/constants/routes";
 
 interface BoardCardProps {

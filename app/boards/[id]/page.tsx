@@ -1,8 +1,9 @@
+import { redirect } from "next/navigation";
+
 import { auth } from "@/auth";
 import BoardDetailsWithProvider from "@/components/boards/BoardDetailsWithProvider";
 import { ROUTES } from "@/constants/routes";
 import { getBoard, getColumns } from "@/lib/services/boards";
-import { redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ id: string }>;

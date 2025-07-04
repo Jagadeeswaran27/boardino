@@ -1,11 +1,13 @@
+import Image from "next/image";
+import { Fragment, useState } from "react";
+
+import { toast } from "react-toastify";
+import { Dialog, Transition } from "@headlessui/react";
+import { MdAccessTime, MdCalendarToday, MdClose, MdEdit } from "react-icons/md";
+
 import { IMAGES } from "@/constants/Images";
 import { useBoardContext } from "@/context/BoardContext";
 import { Task } from "@/types/board";
-import { Dialog, Transition } from "@headlessui/react";
-import Image from "next/image";
-import React, { Fragment, useState } from "react"; // Add useState
-import { MdAccessTime, MdCalendarToday, MdClose, MdEdit } from "react-icons/md";
-import { toast } from "react-toastify"; // Add this import
 
 interface TaskPopupProps {
   task: Task;

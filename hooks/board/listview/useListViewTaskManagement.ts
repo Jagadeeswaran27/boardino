@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+
+import { toast } from "react-toastify";
+
 import { Task } from "@/types/board";
 import { getListViewTasks, updateTask } from "@/lib/services/boards";
-import { toast } from "react-toastify";
 import { useBoardContext } from "@/context/BoardContext";
 
 export function useListViewTaskManagement() {
