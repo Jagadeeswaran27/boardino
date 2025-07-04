@@ -106,6 +106,8 @@ function createInviteEmailHTML({
 
 export async function POST(request: Request) {
   try {
+    console.log(transporter, process.env.SMTP_USER, process.env.SMTP_PASS);
+
     const { email, boardId, boardName, message, senderName, role } =
       (await request.json()) as {
         email: string[];
