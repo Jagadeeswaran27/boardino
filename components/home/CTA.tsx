@@ -1,8 +1,17 @@
 "use client";
-import { motion } from "framer-motion";
+
+import Link from "next/link";
 import { useMemo } from "react";
 
+import { useSession } from "next-auth/react";
+import { FaArrowRight } from "react-icons/fa";
+import { motion } from "framer-motion";
+
+import { ROUTES } from "@/constants/routes";
+
 const CTA = () => {
+  const { data: session } = useSession();
+  const user = session?.user;
   const cardPositions = useMemo(
     () => [
       { left: "5.529222262434641%", top: "18.19187442176281%" },
@@ -114,20 +123,13 @@ const CTA = () => {
             projects on time, every time.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.button
-              className="px-6 py-3 bg-white text-primary rounded-md text-lg hover:bg-neutral-100 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <Link
+              href={user ? ROUTES.boards : ROUTES.signup}
+              className="px-6 py-3 border border-white rounded-md text-lg hover:bg-white/10 transition-colors flex items-center justify-center text-white font-semibold"
             >
-              Start your free trial
-            </motion.button>
-            <motion.button
-              className="px-6 py-3 border border-white rounded-md text-lg hover:bg-white/10 transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Schedule a demo
-            </motion.button>
+              {user ? "View Boards" : "Start for free"}{" "}
+              <FaArrowRight className="ml-2" />
+            </Link>
           </div>
         </div>
       </div>

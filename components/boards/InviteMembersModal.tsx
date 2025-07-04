@@ -1,12 +1,15 @@
 "use client";
+
 import React, { useState } from "react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+
 import { motion } from "framer-motion";
 import md5 from "md5";
-import Image from "next/image";
-import { sendInviteEmail } from "@/lib/services/boards";
-import { useParams } from "next/navigation";
 import { Role } from "@prisma/client";
 import { toast } from "react-toastify";
+
+import { sendInviteEmail } from "@/lib/services/boards";
 import { useBoardContext } from "@/context/BoardContext";
 
 interface InviteMembersModalProps {

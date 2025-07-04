@@ -1,7 +1,11 @@
 "use server";
-import { User } from "@/types/auth";
-import { prisma } from "../prisma";
+
 import bcrypt from "bcryptjs";
+
+import { User, UserWithAllDetails } from "@/types/auth";
+
+import { prisma } from "../prisma";
+
 export const addUserInfo = async (user: User): Promise<boolean> => {
   try {
     const isExistingUser = await prisma.user.findFirst({
@@ -73,7 +77,64 @@ export const getUsersInfoById = async (userIds: string[]): Promise<User[]> => {
     id: user.id,
     name: user.name,
     email: user.email,
-    image: user.image,
+    image: user.image ?? "",
+    hashedPassword: user.hashedPassword ?? "",
     authenticationMethod: user.authenticationMethod,
   }));
+};
+
+export const getUserWithAllDetails = async (
+  userId: string
+): Promise<UserWithAllDetails | null> => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        boardsOwned: {
+          include: {
+            tasks: true,
+          },
+        },
+        assignedTasks: {
+          include: {
+            board: {
+              include: {
+                tasks: true,
+              },
+            },
+          },
+        },
+        boardMemberships: {
+          include: {
+            board: {
+              include: {
+                owner: true,
+                tasks: true,
+              },
+            },
+            user: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      image: user.image ?? "",
+      hashedPassword: user.hashedPassword ?? "",
+      authenticationMethod: user.authenticationMethod,
+      boardsOwned: user.boardsOwned ?? [],
+      assignedTasks: user.assignedTasks ?? [],
+      boardMemberships: user.boardMemberships ?? [],
+    };
+  } catch (error) {
+    console.error("Error fetching user with all details:", error);
+    return null;
+  }
 };

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   FaBold,
   FaItalic,
@@ -8,7 +10,6 @@ import {
   FaUnlink,
 } from "react-icons/fa";
 import { Editor } from "@tiptap/react";
-import { useState } from "react";
 import { toast } from "react-toastify";
 
 const RichTextDescription = ({ editor }: { editor: Editor | null }) => {

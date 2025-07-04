@@ -1,7 +1,8 @@
 "use client";
 
-import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useEffect, useState } from "react";
+
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 const OfflineToast = () => {
   const isOnline = useOnlineStatus();

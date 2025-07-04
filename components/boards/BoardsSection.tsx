@@ -1,8 +1,10 @@
 "use client";
 
-import { Board } from "@/types/board";
-import BoardCard from "./BoardCard";
 import { FaPlus } from "react-icons/fa";
+
+import { Board } from "@/types/board";
+
+import BoardCard from "./BoardCard";
 
 interface BoardsSectionProps {
   boards: Board[];

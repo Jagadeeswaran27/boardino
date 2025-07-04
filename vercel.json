@@ -1,6 +1,8 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "github": {
-    "autoJobCancelation": false
-  }
+  "build": {
+    "env": {
+      "VERCEL_ENV": "production"
+    }
+  },
+  "ignoreCommand": "if [ \"$VERCEL_ENV\" != \"production\" ]; then echo 'Skipping build'; exit 0; fi"
 }

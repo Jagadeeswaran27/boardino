@@ -1,7 +1,8 @@
+import { redirect } from "next/navigation";
+
 import { auth } from "@/auth";
 import { ROUTES } from "@/constants/routes";
 import NotAuthenticatedCard from "@/components/boards/invitation/auth/NotAuthenticatedCard";
-import { redirect } from "next/navigation";
 import { getBoardInvitation } from "@/lib/services/boards";
 import NotAuthorizedCard from "@/components/boards/invitation/auth/NotAuthorizedCard";
 import BoardInvitationCard from "@/components/boards/invitation/BoardInvitationCard";

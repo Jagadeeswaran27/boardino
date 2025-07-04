@@ -1,5 +1,6 @@
-import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+
+import { prisma } from "@/lib/prisma";
 
 const LIMIT = 5;
 export async function GET(req: Request) {

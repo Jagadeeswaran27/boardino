@@ -27,8 +27,148 @@
   --color-accent-glow: rgba(101, 84, 192, 0.1);
 }
 
+/* Enhanced animations for login form */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.6s ease-out 0.1s both;
+}
+
+.animate-slide-up-delay {
+  animation: slide-up 0.6s ease-out 0.2s both;
+}
+
+.animate-fade-in-delay {
+  animation: fade-in 0.6s ease-out 0.3s both;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 .btn-primary {
-  @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-colors cursor-pointer;
+  @apply px-4 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all cursor-pointer;
+}
+
+/* Enhanced header styles */
+.header-nav-link {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+.header-nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--color-primary);
+  transition: width 0.3s ease-in-out;
+}
+
+.header-nav-link:hover::after {
+  width: 100%;
+}
+
+.logo-icon {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-accent)
+  );
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px var(--color-primary-glow);
+}
+
+.logo-icon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-icon:hover::before {
+  opacity: 1;
+}
+
+.user-avatar {
+  transition: all 0.2s ease-in-out;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.mobile-menu-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.mobile-menu-button:hover {
+  background-color: var(--color-neutral-50);
+  border-radius: 0.375rem;
+}
+
+/* Status indicator for online users */
+.status-indicator {
+  background-color: var(--color-secondary);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .card-shadow {
@@ -169,14 +309,63 @@
     font-size: 0.85rem;
     padding: 0.25em 0.3em;
   }
+}
 
-  /* Link styles */
-  a {
-    color: var(--purple);
-    cursor: pointer;
+/* Global smooth scrollbar styling */
+html {
+  scroll-behavior: smooth;
+}
 
-    &:hover {
-      color: var(--purple-contrast);
-    }
-  }
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-neutral-200) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--color-neutral-200);
+  border-radius: 20px;
+  transition: background-color 0.2s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-neutral-300);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Enhanced form input styles */
+.auth-input {
+  @apply w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+}
+
+.auth-input:focus {
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.auth-button {
+  @apply w-full py-3 px-4 bg-gradient-to-r from-primary to-accent text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98];
+}
+
+.auth-button:hover {
+  box-shadow: 0 4px 12px var(--color-primary-glow);
+}
+
+/* Subtle glass effect for form containers */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }

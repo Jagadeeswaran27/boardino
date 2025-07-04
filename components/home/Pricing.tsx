@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 
 const CheckIcon = () => (
   <svg
@@ -93,7 +93,7 @@ const Pricing = () => {
           <div className="inline-flex items-center bg-neutral-200 p-1 rounded-lg">
             <button
               onClick={() => setIsAnnual(false)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 cursor-pointer py-2 rounded-md text-sm font-medium transition-all ${
                 !isAnnual
                   ? "bg-white text-primary shadow-sm"
                   : "text-neutral-600 hover:text-neutral-800"
@@ -103,7 +103,7 @@ const Pricing = () => {
             </button>
             <button
               onClick={() => setIsAnnual(true)}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+              className={`px-4 cursor-pointer py-2 rounded-md text-sm font-medium transition-all ${
                 isAnnual
                   ? "bg-white text-primary shadow-sm"
                   : "text-neutral-600 hover:text-neutral-800"

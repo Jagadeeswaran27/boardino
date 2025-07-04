@@ -1,6 +1,7 @@
+import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/prisma";
 import { Task } from "@/types/board";
-import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {

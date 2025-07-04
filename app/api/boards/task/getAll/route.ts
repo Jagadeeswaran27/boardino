@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { PrismaClient } from "@prisma/client";
+
 import { TAB, TAB_TYPE } from "@/lib/utils/board";
 import { Task } from "@/types/board";
 

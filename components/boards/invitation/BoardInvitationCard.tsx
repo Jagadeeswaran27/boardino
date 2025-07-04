@@ -1,7 +1,9 @@
 import React from "react";
 import { SiGooglemessages } from "react-icons/si";
-import AcceptInvitationButton from "./buttons/AcceptInvitationButton";
+
 import { BoardInvitation } from "@prisma/client";
+
+import AcceptInvitationButton from "./buttons/AcceptInvitationButton";
 
 interface BoardInvitationCardProps {
   boardName?: string;

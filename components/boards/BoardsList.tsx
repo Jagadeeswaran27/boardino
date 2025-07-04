@@ -1,19 +1,21 @@
 "use client";
-import CreateBoardModal from "./CreateBoardModal";
 import { useState } from "react";
+
 import { Board } from "@/types/board";
+import { useBoards } from "@/hooks/board/useBoards";
+
+import CreateBoardModal from "./CreateBoardModal";
 import BoardsHeader from "./BoardsHeader";
 import BoardsSection from "./BoardsSection";
 import CustomUndoNotification from "./CustomUndoNotification";
-import { useBoards } from "@/hooks/board/useBoards";
 
 const BoardsList = ({ initialBoards }: { initialBoards: Board[] }) => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     recentlyDeleted,
     showUndoNotification,
+    isModalOpen,
     getFilteredBoards,
     getContributedBoards,
     getOwnedBoards,
@@ -21,6 +23,7 @@ const BoardsList = ({ initialBoards }: { initialBoards: Board[] }) => {
     handleDeleteBoard,
     handleUndoDelete,
     updateBoardList,
+    setIsModalOpen,
   } = useBoards(initialBoards);
 
   const filteredBoards = getFilteredBoards(searchQuery);

@@ -1,6 +1,8 @@
-import { prisma } from "@/lib/prisma";
-import { Task } from "@prisma/client";
 import { NextResponse } from "next/server";
+
+import { Task } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
 
 export async function PUT(req: Request) {
   const { searchParams } = new URL(req.url);

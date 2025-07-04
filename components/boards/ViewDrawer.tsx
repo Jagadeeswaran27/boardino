@@ -1,10 +1,12 @@
 "use client";
 
+import React, { useState } from "react";
+
+import { TbLayoutKanban } from "react-icons/tb";
+import { IoCloseOutline, IoGridOutline, IoListOutline } from "react-icons/io5";
+
 import { useBoardContext } from "@/context/BoardContext";
 import { TAB_TYPE } from "@/lib/utils/board";
-import React, { useState } from "react";
-import { IoCloseOutline, IoGridOutline, IoListOutline } from "react-icons/io5";
-import { TbLayoutKanban } from "react-icons/tb";
 
 const ViewDrawer = ({
   isOpen,

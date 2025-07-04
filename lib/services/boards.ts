@@ -1,7 +1,9 @@
-import { auth } from "@/auth";
-import { prisma } from "../prisma";
-import { Board, Column, Task } from "@/types/board";
 import { BoardInvitation } from "@prisma/client";
+
+import { auth } from "@/auth";
+import { Board, Column, Task } from "@/types/board";
+
+import { prisma } from "../prisma";
 import { PaginatedListViewTasks, TAB, TAB_TYPE } from "../utils/board";
 
 const url = process.env.NEXT_PUBLIC_URL;
@@ -251,6 +253,8 @@ export const sendInviteEmail = async (
       role,
     }),
   });
+
+  console.log("Response from sendInviteEmail:", response);
   if (!response.ok) {
     return false;
   }
@@ -334,4 +338,21 @@ export const acceptBoardInvitation = async (
   }
   const res = (await response.json()) as boolean;
   return res;
+};
+
+export const updateBoardName = async (
+  boardId: string,
+  newName: string
+): Promise<boolean> => {
+  const response = await fetch(`${url}/api/boards/updateName`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ boardId, newName }),
+  });
+  if (!response.ok) {
+    return false;
+  }
+  return true;
 };

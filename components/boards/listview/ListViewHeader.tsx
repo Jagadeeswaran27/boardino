@@ -1,8 +1,8 @@
+import { useSession } from "next-auth/react";
+import { MdAdd, MdFilterList } from "react-icons/md";
+
 import Filter from "@/components/columns/Filter";
 import { useBoardContext } from "@/context/BoardContext";
-import { useSession } from "next-auth/react";
-import React from "react";
-import { MdAdd, MdFilterList } from "react-icons/md";
 
 interface ListViewHeaderProps {
   showFilterDropdown: boolean;

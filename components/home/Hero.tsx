@@ -1,6 +1,15 @@
-import { FaPlay, FaArrowRight, FaCheckCircle } from "react-icons/fa";
+import Link from "next/link";
 
-const Hero = () => {
+import { FaArrowRight } from "react-icons/fa";
+
+import { auth } from "@/auth";
+import { ROUTES } from "@/constants/routes";
+
+const Hero = async () => {
+  const session = await auth();
+
+  const user = session?.user;
+
   return (
     <section className="bg-neutral-50 py-16 md:py-24 relative overflow-hidden">
       {/* Background pattern */}
@@ -33,23 +42,17 @@ const Hero = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
-              <button className="px-6 py-3 bg-primary text-white rounded-md text-lg hover:bg-primary-dark transition-colors flex items-center justify-center">
-                Start for free <FaArrowRight className="ml-2" />
-              </button>
-              <button className="px-6 py-3 border border-neutral-200 rounded-md text-lg hover:bg-white transition-colors flex items-center justify-center">
-                <FaPlay className="mr-2" /> Watch demo
-              </button>
-            </div>
-
-            <div className="flex items-center text-sm text-neutral-600">
-              <FaCheckCircle className="text-primary mr-2" /> No credit card
-              required
-              <span className="mx-3">•</span>
-              <FaCheckCircle className="text-primary mr-2" /> Free 14-day trial
+              <Link
+                href={user ? ROUTES.boards : ROUTES.signup}
+                className="px-6 py-3 bg-primary cursor-pointer text-white rounded-md text-lg hover:bg-primary-dark transition-colors flex items-center justify-center"
+              >
+                {user ? "View Boards" : "Start for free"}{" "}
+                <FaArrowRight className="ml-2" />
+              </Link>
             </div>
           </div>
 
-          <div className="md:w-1/2 mt-12 md:mt-0">
+          <div className="md:w-1/2 hidden md:block mt-12 md:mt-0">
             <div className="relative h-96 md:h-[450px] w-full rounded-lg overflow-hidden shadow-xl">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent opacity-90"></div>
               <div className="absolute inset-0 flex items-center justify-center">
@@ -62,9 +65,12 @@ const Hero = () => {
                         <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
                         <div className="h-3 w-3 rounded-full bg-green-400"></div>
                       </div>
-                      <div className="bg-neutral-100 rounded-md px-2 py-1 text-xs text-neutral-500">
-                        boardino.app/projects
-                      </div>
+                      <Link
+                        href={"/boards"}
+                        className="bg-neutral-100 rounded-md px-2 py-1 text-xs text-neutral-500"
+                      >
+                        boardino.vercel.app/boards
+                      </Link>
                       <div className="w-16"></div>
                     </div>
 
@@ -103,8 +109,8 @@ const Hero = () => {
                                     {colIndex === 0
                                       ? 4
                                       : colIndex === 1
-                                      ? 3
-                                      : 2}
+                                        ? 3
+                                        : 2}
                                   </div>
                                 </div>
                                 {[
@@ -118,8 +124,8 @@ const Hero = () => {
                                       colIndex === 0
                                         ? "border-yellow-400"
                                         : colIndex === 1
-                                        ? "border-blue-400"
-                                        : "border-green-400"
+                                          ? "border-blue-400"
+                                          : "border-green-400"
                                     } shadow-sm`}
                                   >
                                     <div className="h-4 bg-neutral-200 rounded-md w-2/3 mb-2"></div>
