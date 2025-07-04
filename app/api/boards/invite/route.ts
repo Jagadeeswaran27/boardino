@@ -141,6 +141,8 @@ export async function POST(request: Request) {
         },
       });
 
+      console.log("Existing Invitation:", existingInvitation);
+
       if (!existingInvitation) {
         const boardInvitation = await prisma.boardInvitation.create({
           data: {
