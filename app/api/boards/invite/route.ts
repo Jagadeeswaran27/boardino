@@ -108,6 +108,14 @@ export async function POST(request: Request) {
   try {
     console.log(transporter, process.env.SMTP_USER, process.env.SMTP_PASS);
 
+    try {
+      await transporter.verify();
+      console.log("SMTP connection verified successfully");
+    } catch (error) {
+      console.error("SMTP connection verification failed:", error);
+      return NextResponse.json("SMTP connection failed", { status: 500 });
+    }
+
     const { email, boardId, boardName, message, senderName, role } =
       (await request.json()) as {
         email: string[];
