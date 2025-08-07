@@ -126,7 +126,9 @@ const ColumnDetails = () => {
       {showModal && (
         <AddTaskForm
           isOpen={showModal}
-          columnId={tabType === "Column View" ? activeColumn!.id : ""}
+          columnId={
+            tabType === "Column View" && activeColumn ? activeColumn.id : ""
+          }
           updateTask={updateTasks}
           closeModal={handleCloseModal}
         />

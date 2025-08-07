@@ -8,6 +8,7 @@ import CreateBoardModal from "./CreateBoardModal";
 import BoardsHeader from "./BoardsHeader";
 import BoardsSection from "./BoardsSection";
 import CustomUndoNotification from "./CustomUndoNotification";
+import BackToHome from "../auth/BackToHome";
 
 const BoardsList = ({ initialBoards }: { initialBoards: Board[] }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +33,9 @@ const BoardsList = ({ initialBoards }: { initialBoards: Board[] }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl min-h-screen relative bg-pattern">
+      <div className="mb-4 flex items-center justify-between">
+        <BackToHome />
+      </div>
       <div className="relative z-10">
         <BoardsHeader
           searchQuery={searchQuery}

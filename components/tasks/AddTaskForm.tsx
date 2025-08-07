@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent, ChangeEvent } from "react";
 import { Fragment } from "react";
 
 import { Dialog, Transition } from "@headlessui/react";
@@ -12,14 +12,14 @@ import ListItem from "@tiptap/extension-list-item";
 import Link from "@tiptap/extension-link";
 import { FaTimes } from "react-icons/fa";
 
-import { addTask } from "@/lib/services/boards";
+import { addTask, createColumn } from "@/lib/services/boards";
 import { Task } from "@/types/board";
 import RichTextDescription from "./RichTextDescription";
 import { useBoardContext } from "@/context/BoardContext";
 
 interface AddTaskFormProps {
   isOpen: boolean;
-  columnId: string | null;
+  columnId: string;
   updateTask: (task: Task) => void;
   closeModal: () => void;
 }
@@ -31,7 +31,7 @@ const AddTaskForm = ({
   updateTask,
   closeModal,
 }: AddTaskFormProps) => {
-  const { columns, tabType, board, activeTab } = useBoardContext();
+  const { columns, tabType, board, activeTab, setColumns } = useBoardContext();
   const [form, setForm] = useState({
     name: "",
     description: "",
@@ -43,11 +43,14 @@ const AddTaskForm = ({
   const [errors, setErrors] = useState({
     name: "",
     description: "",
+    columnId: "",
   });
 
   const [loading, setIsLoading] = useState(false);
   const [descriptionType, setDescriptionType] =
     useState<DescriptionType>("text");
+  const [showNewColumnInput, setShowNewColumnInput] = useState(false);
+  const [newColumnName, setNewColumnName] = useState("");
 
   const users = board.members?.map((member) => member.user) || [];
 
@@ -105,26 +108,31 @@ const AddTaskForm = ({
   }, [descriptionType, form.description, editor]);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
 
-    if (
-      errors[e.target.name as keyof typeof errors] &&
-      e.target.name !== "description"
-    ) {
+    if (name === "columnId" && value === "") {
+      setShowNewColumnInput(true);
+      setForm({ ...form, columnId: "" });
+    } else if (name === "columnId") {
+      setShowNewColumnInput(false);
+      setForm({ ...form, [name]: value });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+
+    if (errors[name as keyof typeof errors] && name !== "description") {
       setErrors({
         ...errors,
-        [e.target.name]: "",
+        [name]: "",
       });
     }
   };
 
   const validateForm = () => {
     let valid = true;
-    const newErrors = { name: "", description: "" };
+    const newErrors = { name: "", description: "", columnId: "" };
 
     if (!form.name.trim()) {
       newErrors.name = "Task name is required";
@@ -143,36 +151,74 @@ const AddTaskForm = ({
       }
     }
 
+    if (showNewColumnInput && !newColumnName.trim()) {
+      newErrors.columnId = "Column name is required";
+      valid = false;
+    }
+
     setErrors(newErrors);
     return valid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) return;
     setIsLoading(true);
-    const taskData = {
-      name: form.name,
-      description: form.description,
-      columnId:
+
+    try {
+      let finalColumnId = form.columnId;
+
+      if (showNewColumnInput && newColumnName.trim()) {
+        const newColumn = await createColumn(board.id, newColumnName.trim());
+        if (!newColumn) {
+          toast.error("Failed to create new column");
+          setIsLoading(false);
+          return;
+        }
+
+        setColumns((prevColumns) => [...prevColumns, newColumn]);
+        finalColumnId = newColumn.id;
+      }
+
+      const colId =
         tabType === "Kanban View" || tabType === "List View"
           ? form.columnId
-          : columnId,
-      assigneeId: form.assigneeId === "" ? null : form.assigneeId,
-      dueDate: form.dueDate.trim().length > 0 ? form.dueDate : null,
-      boardId: board.id,
-    } as Task;
-    const addedTask = await addTask(taskData);
+          : finalColumnId;
 
-    if (!addedTask) {
-      toast.error("Failed to add task");
-      return;
+      if (!colId || colId === "") {
+        setErrors((prev) => ({ ...prev, columnId: "Column is required" }));
+        setIsLoading(false);
+        return;
+      }
+
+      const taskData = {
+        name: form.name,
+        description: form.description,
+        columnId: colId,
+        assigneeId: form.assigneeId === "" ? null : form.assigneeId,
+        dueDate: form.dueDate.trim().length > 0 ? form.dueDate : null,
+        boardId: board.id,
+      } as Task;
+
+      const addedTask = await addTask(taskData);
+
+      if (!addedTask) {
+        toast.error("Failed to add task");
+        return;
+      }
+
+      updateTask(addedTask);
+      setIsLoading(false);
+      closeModal();
+
+      setShowNewColumnInput(false);
+      setNewColumnName("");
+    } catch (error) {
+      console.error("Error creating task:", error);
+      toast.error("Failed to create task");
+      setIsLoading(false);
     }
-
-    updateTask(addedTask);
-    setIsLoading(false);
-    closeModal();
   };
 
   const canDueDateShown =
@@ -180,13 +226,16 @@ const AddTaskForm = ({
     tabType === "Column View" ||
     tabType === "List View";
 
-  // Toggle function for description type
+  const isColumnView = tabType === "Column View";
+
+  const columnName = columns.find(
+    (column) => column.id === form.columnId
+  )?.name;
+
   const toggleDescriptionType = (type: DescriptionType) => {
     if (type === descriptionType) return;
 
-    // Convert content when switching modes
     if (type === "rich-text" && editor) {
-      // Plain text to rich text - wrap in paragraph tags if needed
       const textContent = form.description.trim();
       if (textContent && !textContent.startsWith("<")) {
         const htmlContent = `<p>${textContent.replace(/\n/g, "</p><p>")}</p>`;
@@ -194,7 +243,6 @@ const AddTaskForm = ({
         setForm((prev) => ({ ...prev, description: htmlContent }));
       }
     } else if (type === "text" && editor) {
-      // Rich text to plain text - extract just the text content
       const plainText = editor.getText();
       setForm((prev) => ({ ...prev, description: plainText }));
     }
@@ -267,15 +315,16 @@ const AddTaskForm = ({
                       <p className="mt-1 text-sm text-red-500">{errors.name}</p>
                     )}
                   </div>
-                  {tabType !== "Kanban View" && (
-                    <div>
-                      <label
-                        className="block text-sm font-medium mb-1"
-                        htmlFor="columnId"
-                      >
-                        Select Label(Column)
-                        <span className="text-red-500">*</span>
-                      </label>
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      htmlFor="columnId"
+                    >
+                      Select Label(Column)
+                      <span className="text-red-500">*</span>
+                    </label>
+                    {!showNewColumnInput ? (
                       <select
                         id="columnId"
                         name="columnId"
@@ -283,14 +332,61 @@ const AddTaskForm = ({
                         onChange={handleChange}
                         className="w-full border border-neutral-300 rounded-md px-3 py-2"
                       >
-                        {columns.map((column) => (
-                          <option key={column.id} value={column.id}>
-                            {column.name}
+                        {columnId === "" && <option>select an option</option>}
+                        {isColumnView && columnId !== "" && (
+                          <option selected={true} value={columnId}>
+                            {columnName}
                           </option>
-                        ))}
+                        )}
+                        {!isColumnView &&
+                          columns.map((column) => (
+                            <option key={column.id} value={column.id}>
+                              {column.name}
+                            </option>
+                          ))}
+                        {!isColumnView && columnId === "" && (
+                          <option value="">New Column +</option>
+                        )}
                       </select>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="space-y-2">
+                        <input
+                          type="text"
+                          value={newColumnName}
+                          onChange={(e) => setNewColumnName(e.target.value)}
+                          placeholder="Enter column name"
+                          className={`w-full border ${
+                            errors.columnId
+                              ? "border-red-500"
+                              : "border-neutral-300"
+                          } rounded-md px-3 py-2`}
+                          autoFocus
+                        />
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowNewColumnInput(false);
+                              setNewColumnName("");
+                              setForm({
+                                ...form,
+                                columnId: columns[0]?.id || "",
+                              });
+                            }}
+                            className="px-3 py-1 text-sm text-neutral-600 hover:text-neutral-800"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {errors.columnId && (
+                      <p className="mt-1 text-sm text-red-500">
+                        {errors.columnId}
+                      </p>
+                    )}
+                  </div>
+
                   <div>
                     <div className="flex justify-between items-center mb-1">
                       <label

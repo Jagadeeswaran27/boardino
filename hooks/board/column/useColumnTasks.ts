@@ -10,7 +10,6 @@ export function useColumnTasks() {
   const [loading, setLoading] = useState(true);
   const { activeColumn, activeTab, tabType, board, filter } = useBoardContext();
 
-  // Load tasks when dependencies change
   useEffect(() => {
     const handleGetTasks = async () => {
       setLoading(true);
@@ -27,7 +26,6 @@ export function useColumnTasks() {
     handleGetTasks();
   }, [board.id, tabType, activeColumn, activeTab]);
 
-  // Apply filters when filter changes
   useEffect(() => {
     applyFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -63,7 +61,7 @@ export function useColumnTasks() {
   };
 
   const updateTasks = (newTask: Task) => {
-    if (tabType === "Column View" && newTask.dueDate !== null) {
+    if (newTask.dueDate) {
       setTasks((prevTasks) => [...prevTasks, newTask]);
       setOriginalTasks((prevTasks) => [...prevTasks, newTask]);
     }

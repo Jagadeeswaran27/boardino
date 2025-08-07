@@ -5,6 +5,7 @@ import AssignedTasks from "@/components/profile/AssignedTasks";
 import BoardsDetails from "@/components/profile/BoardsDetails";
 import StatsCards from "@/components/profile/StatsCards";
 import UserInfo from "@/components/profile/UserInfo";
+import BackToHome from "@/components/auth/BackToHome";
 
 const ProfilePage = async () => {
   const session = await auth();
@@ -36,16 +37,19 @@ const ProfilePage = async () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="mb-4 flex items-center justify-end">
+      <div className="mb-4 flex items-center justify-between">
+        <BackToHome />
         <SignoutButton />
       </div>
-      {/* User Info Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-bold text-neutral-900">Profile</h1>
+        </div>
+      </div>
+
       <UserInfo userInfo={userInfo} />
-      {/* Stats Cards */}
       <StatsCards userInfo={userInfo} />
-      {/* Boards Section */}
       <BoardsDetails userInfo={userInfo} />
-      {/* Assigned Tasks */}
       {userInfo.assignedTasks && userInfo.assignedTasks.length > 0 && (
         <AssignedTasks userInfo={userInfo} />
       )}

@@ -4,9 +4,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { ROUTES } from "@/constants/routes";
 import { IMAGES } from "@/constants/Images";
-
-// import SignoutButton from "../auth/SignoutButton";
-
+import HeaderNav from "../common/HeaderNav";
 const Header = async () => {
   const session = await auth();
 
@@ -15,7 +13,6 @@ const Header = async () => {
   return (
     <header className="bg-white sticky top-0 z-50 shadow-sm border-b border-neutral-100">
       <div className="container mx-auto px-4 flex justify-between items-center">
-        {/* Logo Section */}
         <div className="flex items-center gap-3">
           <Link
             href={ROUTES.home}
@@ -30,39 +27,8 @@ const Header = async () => {
           </Link>
         </div>
 
-        {/* Navigation */}
-        <nav className="hidden lg:flex items-center gap-8">
-          <Link
-            href="#features"
-            className="text-neutral-700 hover:text-primary transition-colors font-medium relative group"
-          >
-            Features
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-          </Link>
-          <Link
-            href="#solutions"
-            className="text-neutral-700 hover:text-primary transition-colors font-medium relative group"
-          >
-            Solutions
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-          </Link>
-          {/* <Link
-            href="#pricing"
-            className="text-neutral-700 hover:text-primary transition-colors font-medium relative group"
-          >
-            Pricing
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-          </Link> */}
-          <Link
-            href="#resources"
-            className="text-neutral-700 hover:text-primary transition-colors font-medium relative group"
-          >
-            Resources
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-          </Link>
-        </nav>
+        <HeaderNav />
 
-        {/* User Section */}
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-3">
@@ -85,9 +51,6 @@ const Header = async () => {
                 </svg>
                 Boards
               </Link>
-              {/* <div className="hidden sm:block">
-                <SignoutButton />
-              </div> */}
               <div className="relative">
                 <Link href={ROUTES.profile}>
                   <Image
@@ -130,7 +93,6 @@ const Header = async () => {
               >
                 Get started
               </Link>
-              {/* Mobile menu button for non-authenticated users */}
               <button className="lg:hidden p-2 text-neutral-700 hover:text-primary transition-colors">
                 <svg
                   className="w-6 h-6"

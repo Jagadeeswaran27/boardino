@@ -6,8 +6,6 @@ import { SessionProvider } from "next-auth/react";
 import { Analytics } from "@vercel/analytics/next";
 
 import { auth } from "@/auth";
-import Header from "@/components/home/Header";
-import Footer from "@/components/home/Footer";
 import OfflineToast from "@/components/common/OfflineIndicator";
 import { geistMono, geistSans } from "@/constants/fonts";
 
@@ -115,9 +113,7 @@ const RootLayout = async ({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <Header />
           {children}
-          <Footer />
           <ToastContainer
             position="top-right"
             autoClose={5000}

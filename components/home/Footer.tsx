@@ -1,3 +1,6 @@
+import { IMAGES } from "@/constants/Images";
+import Image from "next/image";
+
 const Footer = () => {
   return (
     <footer className="bg-neutral-900 text-white py-12 md:py-16 mt-auto">
@@ -5,10 +8,12 @@ const Footer = () => {
         <div className="grid md:grid-cols-5 gap-8 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="h-10 w-10 bg-white rounded-md flex items-center justify-center">
-                <span className="text-primary font-bold text-xl">B</span>
-              </div>
-              <h2 className="text-2xl font-bold">Boardino</h2>
+              <Image
+                src={IMAGES.logoWhite}
+                alt="Boardino Logo"
+                width={120}
+                height={120}
+              />
             </div>
             <p className="text-neutral-400 mb-6 max-w-md">
               Powerful project management software that helps teams plan,

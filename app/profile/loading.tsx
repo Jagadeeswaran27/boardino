@@ -7,8 +7,9 @@ const SkeletonBox = ({ className = "" }: { className?: string }) => (
 const Loading = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Sign out button skeleton */}
-      <div className="mb-4 flex items-center justify-end">
+      {/* Back to home and Sign out buttons skeleton */}
+      <div className="mb-4 flex items-center justify-between">
+        <SkeletonBox className="h-9 w-32" />
         <SkeletonBox className="h-9 w-24" />
       </div>
 
