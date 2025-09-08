@@ -81,7 +81,7 @@ const LoginForm = () => {
     setIsLoading(false);
   };
 
-  const handleOAuthLogin = async (provider: "github" | "google") => {
+  const handleOAuthLogin = async (provider: "github" | "google" | "facebook") => {
     setIsLoading(true);
     try {
       await signIn(provider, {
@@ -109,6 +109,20 @@ const LoginForm = () => {
             className="mr-2"
           />
           <span>Google</span>
+        </button>
+        <button
+          onClick={() => handleOAuthLogin("facebook")}
+          type="button"
+          className="cursor-pointer flex-1 px-4 py-3 border border-neutral-200 rounded-md hover:bg-neutral-50 transition-colors flex items-center justify-center"
+        >
+          <Image
+            src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg"
+            width={18}
+            height={18}
+            alt="Facebook logo"
+            className="mr-2"
+          />
+          <span>Facebook</span>
         </button>
         {/* <button
           onClick={() => handleOAuthLogin("github")}

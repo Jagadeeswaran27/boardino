@@ -1,6 +1,7 @@
 import NextAuth, { User } from "next-auth";
 import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
+import Facebook from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 
@@ -12,6 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     GitHub,
     Google,
+    Facebook,
     CredentialsProvider({
       name: "Credentials",
       credentials: {

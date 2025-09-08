@@ -54,6 +54,33 @@ Boardino is a collaborative board platform, enabling users to create, manage, an
 
 ## Getting Started
 
+### Environment Variables
+
+Before running the application, make sure to set up the required environment variables:
+
+```bash
+# NextAuth
+NEXTAUTH_SECRET=your-nextauth-secret
+NEXTAUTH_URL=http://localhost:3000
+
+# Facebook OAuth (for Facebook Login)
+AUTH_FACEBOOK_ID=your-facebook-app-id
+AUTH_FACEBOOK_SECRET=your-facebook-app-secret
+
+# Google OAuth (for Google Login)
+AUTH_GOOGLE_ID=your-google-client-id
+AUTH_GOOGLE_SECRET=your-google-client-secret
+
+# GitHub OAuth (for GitHub Login)
+AUTH_GITHUB_ID=your-github-client-id
+AUTH_GITHUB_SECRET=your-github-client-secret
+
+# Database
+DATABASE_URL=your-database-url
+```
+
+### Installation and Development
+
 ```bash
 npm install
 npm run dev

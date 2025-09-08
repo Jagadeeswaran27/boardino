@@ -17,4 +17,4 @@ export type UserWithAllDetails = PrismaUser & {
   boardMemberships?: BoardMember[];
 };
 
-export type authenticationMethod = "github" | "google" | "credentials";
+export type authenticationMethod = "github" | "google" | "facebook" | "credentials";
