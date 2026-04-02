@@ -1,7 +1,7 @@
-import { useSearchParams } from "next/navigation";
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, ReactNode } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 
-import { Filter, TAB, TAB_TYPE, TAB_TYPES } from "@/lib/utils/board";
+import { Filter, TAB, TAB_TYPE, TAB_TYPES, TABS } from "@/lib/utils/board";
 import { Board, Column } from "@/types/board";
 
 interface BoardContextProps {
@@ -10,9 +10,10 @@ interface BoardContextProps {
   activeColumn: Column | undefined;
   columns: Column[];
   tabType: TAB_TYPE;
+  cid: string | null;
   filter: Filter;
   setActiveTab: (tab: TAB) => void;
-  setActiveColumn: (column: Column | undefined) => void;
+  setActiveColumn: (column: Column) => void;
   setColumns: (
     newColumns: Column[] | ((prevColumns: Column[]) => Column[])
   ) => void;
@@ -38,7 +39,7 @@ interface BoardProviderProps {
     board: Board;
     columns: Column[];
   };
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const BoardProvider = ({
@@ -46,10 +47,6 @@ export const BoardProvider = ({
   children,
 }: BoardProviderProps) => {
   const [board, setBoard] = useState<Board>(initialContext.board);
-  const [activeTab, setActiveTab] = useState<TAB>("To Do");
-  const [activeColumn, setActiveColumn] = useState<Column | undefined>(
-    initialContext.columns[0]
-  );
   const [columns, setColumns] = useState(initialContext.columns);
   const [filter, setFilter] = useState<Filter>({
     userId: "",
@@ -57,18 +54,51 @@ export const BoardProvider = ({
     createdDate: null,
     dueDate: null,
   });
+
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   const tabType = searchParams.get("view") as TAB_TYPE;
+
+  const activeColumn = columns.find(
+    (col) => col.id === searchParams.get("cid")
+  );
+
   if (!tabType || !TAB_TYPES.includes(tabType)) {
-    history.pushState(null, "", `?view=Column View`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("view", "Column View");
+    router.push(`?${params.toString()}`);
+    return null;
+  }
+
+  const cid = searchParams.get("cid");
+
+  if (tabType === "Column View" && !cid && columns.length > 0) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("tab");
+    params.set("cid", columns[0].id);
+    router.push(`?${params.toString()}`);
+    return null;
+  }
+
+  let activeTab = searchParams.get("tab") as TAB;
+
+  if (tabType !== "Kanban View") {
+    activeTab = "To Do";
+  }
+
+  if (tabType === "Kanban View" && (!activeTab || !TABS.includes(activeTab))) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("cid");
+    params.set("tab", "To Do" as TAB);
+    router.push(`?${params.toString()}`);
     return null;
   }
 
   const updateTabType = (newType: TAB_TYPE) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("view", newType);
-    history.pushState(null, "", `?${params.toString()}`);
+    router.push(`?${params.toString()}`);
   };
 
   const modifyBoardName = (newName: string) => {
@@ -76,6 +106,18 @@ export const BoardProvider = ({
       ...prevBoard,
       name: newName.trim(),
     }));
+  };
+
+  const handleSetActiveColumnById = (column: Column) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("cid", column.id);
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleSetActiveTab = (tab: TAB) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.push(`?${params.toString()}`);
   };
 
   return (
@@ -86,10 +128,11 @@ export const BoardProvider = ({
         activeColumn,
         columns,
         tabType,
+        cid,
         filter,
         setFilter,
-        setActiveColumn,
-        setActiveTab,
+        setActiveColumn: handleSetActiveColumnById,
+        setActiveTab: handleSetActiveTab,
         setColumns,
         updateTabType,
         modifyBoardName,

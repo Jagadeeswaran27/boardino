@@ -13,13 +13,10 @@ interface BoardsSectionProps {
   handleDeleteBoard: (boardId: string) => Promise<void>;
   title: string;
 }
-const BoardsSection = ({
-  boards,
-  searchQuery,
-  setIsModalOpen,
-  handleDeleteBoard,
-  title,
-}: BoardsSectionProps) => {
+
+const BoardsSection = (props: BoardsSectionProps) => {
+  const { boards, searchQuery, setIsModalOpen, handleDeleteBoard, title } =
+    props;
   return (
     <div className="board-section p-6 rounded-xl mb-8">
       <h2 className="text-xl font-semibold text-neutral-900 mb-4">{title}</h2>

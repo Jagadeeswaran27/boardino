@@ -7,7 +7,7 @@ import {
 } from "@prisma/client";
 
 export type Board = PrismaBoard & {
-  owner?: Omit<User, "hashedPassword" | "authenticationMethod">;
+  owner: Omit<User, "hashedPassword" | "authenticationMethod">;
   members?: (PrismaBoardMember & {
     user: Omit<User, "hashedPassword" | "authenticationMethod">;
   })[];

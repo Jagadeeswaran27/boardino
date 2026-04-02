@@ -31,19 +31,21 @@ const AddTaskForm = ({
   updateTask,
   closeModal,
 }: AddTaskFormProps) => {
-  const { columns, tabType, board, activeTab, setColumns } = useBoardContext();
+  const { columns, tabType, board, activeTab, setColumns, setActiveColumn } =
+    useBoardContext();
   const [form, setForm] = useState({
     name: "",
     description: "",
     assigneeId: "",
     dueDate: "",
-    columnId: columns[0]?.id,
+    columnId: columns.find((col) => col.id === columnId)?.id || "",
   });
 
   const [errors, setErrors] = useState({
     name: "",
     description: "",
     columnId: "",
+    dueDate: "",
   });
 
   const [loading, setIsLoading] = useState(false);
@@ -112,7 +114,9 @@ const AddTaskForm = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "columnId" && value === "") {
+    console.log(name, value);
+
+    if (name === "columnId" && value === "new-column") {
       setShowNewColumnInput(true);
       setForm({ ...form, columnId: "" });
     } else if (name === "columnId") {
@@ -132,7 +136,7 @@ const AddTaskForm = ({
 
   const validateForm = () => {
     let valid = true;
-    const newErrors = { name: "", description: "", columnId: "" };
+    const newErrors = { name: "", description: "", columnId: "", dueDate: "" };
 
     if (!form.name.trim()) {
       newErrors.name = "Task name is required";
@@ -156,7 +160,22 @@ const AddTaskForm = ({
       valid = false;
     }
 
+    if (tabType === "Kanban View" && activeTab === "In Progress") {
+      if (!form.dueDate) {
+        newErrors.dueDate = "Due date is required for 'In Progress' tasks";
+        valid = false;
+      }
+    }
+
     setErrors(newErrors);
+    setTimeout(() => {
+      setErrors({
+        name: "",
+        description: "",
+        columnId: "",
+        dueDate: "",
+      });
+    }, 2000);
     return valid;
   };
 
@@ -178,13 +197,11 @@ const AddTaskForm = ({
         }
 
         setColumns((prevColumns) => [...prevColumns, newColumn]);
+        setActiveColumn(newColumn);
         finalColumnId = newColumn.id;
       }
 
-      const colId =
-        tabType === "Kanban View" || tabType === "List View"
-          ? form.columnId
-          : finalColumnId;
+      const colId = finalColumnId;
 
       if (!colId || colId === "") {
         setErrors((prev) => ({ ...prev, columnId: "Column is required" }));
@@ -332,21 +349,29 @@ const AddTaskForm = ({
                         onChange={handleChange}
                         className="w-full border border-neutral-300 rounded-md px-3 py-2"
                       >
-                        {columnId === "" && <option>select an option</option>}
-                        {isColumnView && columnId !== "" && (
-                          <option selected={true} value={columnId}>
-                            {columnName}
-                          </option>
+                        {/* Default placeholder option */}
+                        {form.columnId === "" && (
+                          <option value="">Select an option</option>
                         )}
+
+                        {/* Show the selected column if in Column View */}
+                        {isColumnView && columnId !== "" && (
+                          <option value={columnId}>{columnName}</option>
+                        )}
+
+                        {/* Map through existing columns */}
                         {!isColumnView &&
                           columns.map((column) => (
                             <option key={column.id} value={column.id}>
                               {column.name}
                             </option>
                           ))}
-                        {!isColumnView && columnId === "" && (
-                          <option value="">New Column +</option>
-                        )}
+
+                        {/* Add "New Column +" option */}
+                        {!isColumnView ||
+                          (form.columnId === "" && (
+                            <option value="new-column">New Column +</option>
+                          ))}
                       </select>
                     ) : (
                       <div className="space-y-2">
@@ -475,7 +500,11 @@ const AddTaskForm = ({
                         className="block text-sm font-medium mb-1"
                         htmlFor="dueDate"
                       >
-                        Due Date
+                        Due Date{" "}
+                        {tabType === "Kanban View" &&
+                          activeTab === "In Progress" && (
+                            <span className="text-red-500">*</span>
+                          )}
                       </label>
                       <input
                         id="dueDate"
@@ -486,6 +515,11 @@ const AddTaskForm = ({
                         className={`w-full border border-neutral-300 rounded-md px-3 py-2`}
                       />
                     </div>
+                  )}
+                  {errors.dueDate && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.dueDate}
+                    </p>
                   )}
                   <div className="flex justify-end gap-2">
                     <button

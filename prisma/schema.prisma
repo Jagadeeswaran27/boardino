@@ -48,9 +48,8 @@ model BoardMember {
   userId  String
   boardId String
   role    Role   @default(VIEWER) // ENUM type for role
-
-  user  User  @relation(fields: [userId], references: [id])
-  board Board @relation(fields: [boardId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
+  board   Board  @relation(fields: [boardId], references: [id])
 
   @@unique([userId, boardId]) // Prevent duplicate membership
 }

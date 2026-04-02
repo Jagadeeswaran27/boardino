@@ -61,10 +61,8 @@ export function useColumnTasks() {
   };
 
   const updateTasks = (newTask: Task) => {
-    if (newTask.dueDate) {
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-      setOriginalTasks((prevTasks) => [...prevTasks, newTask]);
-    }
+    setTasks((prevTasks) => [...prevTasks, newTask]);
+    setOriginalTasks((prevTasks) => [...prevTasks, newTask]);
   };
 
   return {

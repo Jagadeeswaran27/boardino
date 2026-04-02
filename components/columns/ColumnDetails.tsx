@@ -21,6 +21,7 @@ const ColumnDetails = () => {
   const { data } = useSession();
 
   const { activeColumn, activeTab, tabType, board } = useBoardContext();
+
   const {
     filterButtonRef,
     filterDropdownRef,
@@ -67,7 +68,7 @@ const ColumnDetails = () => {
         <div className="grid grid-cols-1 gap-4">
           <div
             key={activeTab}
-            className={`bg-gradient-to-b from-section-bg-start to-section-bg-end rounded-lg border border-neutral-200 p-5 `}
+            className={`bg-linear-to-b from-section-bg-start to-section-bg-end rounded-lg border border-neutral-200 p-5 `}
           >
             <h3 className="font-medium text-neutral-900 mb-4 flex items-center justify-between">
               <div className="flex items-center">

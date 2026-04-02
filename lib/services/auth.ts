@@ -44,6 +44,7 @@ export const createUser = async (
     if (isExistingUser) {
       return false;
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     user.hashedPassword = hashedPassword;
 

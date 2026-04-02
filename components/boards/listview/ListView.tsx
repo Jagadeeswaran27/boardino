@@ -65,7 +65,7 @@ const ListView = () => {
         setShowFilterDropdown={setShowFilterDropdown}
       />
       {listViewTasks.length === 0 ? (
-        <div className="text-center py-16 bg-gradient-to-br from-section-bg-start to-section-bg-end rounded-xl shadow-sm border border-neutral-100">
+        <div className="text-center py-16 bg-linear-to-br from-section-bg-start to-section-bg-end rounded-xl shadow-sm border border-neutral-100">
           <div className="max-w-md mx-auto">
             <div className="mb-6">
               <div className="mx-auto h-20 w-20 bg-subtle-accent rounded-full flex items-center justify-center mb-4">

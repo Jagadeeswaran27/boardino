@@ -58,7 +58,7 @@ const BoardCard = ({ board, deleteBoard }: BoardCardProps) => {
       transition={{ duration: 0.1 }}
       className="bg-white border border-neutral-200 rounded-lg shadow-sm hover:shadow-md transition-all overflow-hidden group relative"
     >
-      <div className="h-3 bg-gradient-to-r from-primary to-accent"></div>
+      <div className="h-3 bg-linear-to-r from-primary to-accent"></div>
       <div className="p-5">
         <div className="flex justify-between items-start mb-3">
           <h3 className="text-lg font-semibold text-neutral-900 mb-1 truncate max-w-[80%] group-hover:text-primary transition-colors">
@@ -93,7 +93,7 @@ const BoardCard = ({ board, deleteBoard }: BoardCardProps) => {
           )}
         </div>
 
-        <p className="text-neutral-700 text-sm mb-4 line-clamp-2 min-h-[2.5rem]">
+        <p className="text-neutral-700 text-sm mb-4 line-clamp-2 min-h-10">
           {board.description || "No description"}
         </p>
 

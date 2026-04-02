@@ -1,5 +1,5 @@
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import React, { useRef } from "react";
 
 import { useSession } from "next-auth/react";
 import { HiOutlineViewBoards } from "react-icons/hi";
@@ -55,7 +55,7 @@ const BoardHeader = ({
     (member) => member.userId === data?.user?.id && member.role === "EDITOR"
   );
 
-  const [isEditingBoardName, setIsEditingBoardName] = React.useState(false);
+  const [isEditingBoardName, setIsEditingBoardName] = useState(false);
 
   const canAddColumn = isOwner || isEditor;
 
@@ -81,7 +81,7 @@ const BoardHeader = ({
         <div className="flex items-center gap-2 md:gap-3 mb-4">
           <button
             onClick={() => router.push(ROUTES.boards)}
-            className="text-neutral-500 hover:text-neutral-700 p-1 md:p-2 rounded-full hover:bg-neutral-100 transition-colors flex-shrink-0"
+            className="text-neutral-500 hover:text-neutral-700 p-1 md:p-2 rounded-full hover:bg-neutral-100 transition-colors shrink-0"
             aria-label="Go back to boards"
           >
             <MdArrowBack size={18} className="md:w-5 md:h-5" />
@@ -105,13 +105,13 @@ const BoardHeader = ({
                   />
                   <button
                     onClick={handleSaveBoardName}
-                    className="text-primary hover:text-primary-dark p-1 rounded-full hover:bg-neutral-100 flex-shrink-0"
+                    className="text-primary hover:text-primary-dark p-1 rounded-full hover:bg-neutral-100 shrink-0"
                   >
                     <MdAdd size={16} className="md:w-[18px] md:h-[18px]" />
                   </button>
                   <button
                     onClick={() => setIsEditingBoardName(false)}
-                    className="text-neutral-500 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 flex-shrink-0"
+                    className="text-neutral-500 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 shrink-0"
                   >
                     <MdClose size={16} className="md:w-[18px] md:h-[18px]" />
                   </button>
@@ -124,7 +124,7 @@ const BoardHeader = ({
                   {isOwner && (
                     <button
                       onClick={() => setIsEditingBoardName(true)}
-                      className="text-neutral-500 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 cursor-pointer flex-shrink-0"
+                      className="text-neutral-500 hover:text-neutral-700 p-1 rounded-full hover:bg-neutral-100 cursor-pointer shrink-0"
                     >
                       <MdEdit size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
@@ -180,7 +180,7 @@ const BoardHeader = ({
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap cursor-pointer flex-shrink-0 min-w-fit ${
+                className={`px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap cursor-pointer shrink-0 min-w-fit ${
                   activeTab === tab
                     ? "border-primary text-primary"
                     : "border-transparent text-neutral-600 hover:text-neutral-900"
@@ -200,7 +200,7 @@ const BoardHeader = ({
                 <button
                   key={column.id}
                   onClick={() => setActiveColumn(column)}
-                  className={`px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap cursor-pointer flex-shrink-0 max-w-[120px] md:max-w-none ${
+                  className={`px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap cursor-pointer shrink-0 max-w-[120px] md:max-w-none ${
                     activeColumn?.id === column.id
                       ? "border-primary text-primary"
                       : "border-transparent text-neutral-600 hover:text-neutral-900"
@@ -208,7 +208,7 @@ const BoardHeader = ({
                 >
                   <HiOutlineViewBoards
                     size={16}
-                    className="md:w-[18px] md:h-[18px] flex-shrink-0"
+                    className="md:w-[18px] md:h-[18px] shrink-0"
                   />
                   <span className="truncate">{column.name}</span>
                 </button>
@@ -216,7 +216,7 @@ const BoardHeader = ({
 
               {/* Add Column Button */}
               {isAddingColumn ? (
-                <div className="flex items-center border-b-2 border-transparent -mb-px px-2 flex-shrink-0">
+                <div className="flex items-center border-b-2 border-transparent -mb-px px-2 shrink-0">
                   <input
                     type="text"
                     ref={newColumnInputRef}
@@ -248,7 +248,7 @@ const BoardHeader = ({
                 canAddColumn && (
                   <button
                     onClick={() => setIsAddingColumn(true)}
-                    className="px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium text-neutral-600 hover:text-neutral-900 border-b-2 border-transparent -mb-px cursor-pointer flex-shrink-0"
+                    className="px-3 md:px-4 py-2 flex items-center gap-1 text-xs md:text-sm font-medium text-neutral-600 hover:text-neutral-900 border-b-2 border-transparent -mb-px cursor-pointer shrink-0"
                   >
                     <MdAdd size={16} className="md:w-[18px] md:h-[18px]" />
                     <span className="hidden sm:inline">Add Column</span>

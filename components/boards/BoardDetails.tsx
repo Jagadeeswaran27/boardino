@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 import { Column } from "@/types/board";
@@ -21,38 +21,35 @@ const BoardDetails = () => {
 
   const { setColumns, tabType, board } = useBoardContext();
 
-  const handleAddColumn = useCallback(
-    async (newColumnName: string) => {
-      if (!newColumnName.trim()) {
-        toast.error("Column title cannot be empty");
-        return;
-      }
+  const handleAddColumn = async (newColumnName: string) => {
+    if (!newColumnName.trim()) {
+      toast.error("Column title cannot be empty");
+      return;
+    }
 
-      const tempId = `temp-${Date.now()}`;
-      const tempColumn = {
-        boardId: board.id,
-        id: tempId,
-        name: newColumnName,
-        createdAt: new Date(),
-      } as Column;
+    const tempId = `temp-${Date.now()}`;
+    const tempColumn = {
+      boardId: board.id,
+      id: tempId,
+      name: newColumnName,
+      createdAt: new Date(),
+    } as Column;
 
-      setColumns((prev) => [...prev, tempColumn]);
+    setColumns((prev) => [...prev, tempColumn]);
 
-      setIsAddingColumn(false);
-      const response = await createColumn(board.id, newColumnName);
+    setIsAddingColumn(false);
+    const response = await createColumn(board.id, newColumnName);
 
-      if (!response) {
-        toast.error("Failed to create column");
-        setColumns((prev) => prev.filter((col) => col.id !== tempId));
-        return;
-      }
+    if (!response) {
+      toast.error("Failed to create column");
+      setColumns((prev) => prev.filter((col) => col.id !== tempId));
+      return;
+    }
 
-      setColumns((prev) =>
-        prev.map((col) => (col.id === tempId ? response : col))
-      );
-    },
-    [board.id, setColumns]
-  );
+    setColumns((prev) =>
+      prev.map((col) => (col.id === tempId ? response : col))
+    );
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50">
